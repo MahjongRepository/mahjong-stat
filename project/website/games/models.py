@@ -1,6 +1,6 @@
 from django.db import models
 
-from website.accounts.models import User
+from website.accounts.models import User, Player
 
 
 class Game(models.Model):
@@ -12,10 +12,12 @@ class Game(models.Model):
         (TENHOU, 'Tenhou.net log'),
     )
 
-    user = models.ForeignKey(User)
+    player = models.ForeignKey(Player, related_name='games')
     type = models.PositiveSmallIntegerField(choices=TYPES, default=TENHOU)
+
     external_id = models.TextField(default='', null=True, blank=True)
     player_position = models.PositiveSmallIntegerField(default=0)
+    scores = models.SmallIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
