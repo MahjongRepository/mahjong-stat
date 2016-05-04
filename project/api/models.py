@@ -1,12 +1,12 @@
 from django.db import models
 
-from api.utils import make_random_letters_string
+from api.utils import make_random_letters_and_digit_string
 from website.accounts.models import User
 
 
 class ApiToken(models.Model):
     user = models.ForeignKey(User)
-    token = models.CharField(max_length=40)
+    token = models.CharField(max_length=60)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -19,6 +19,6 @@ class ApiToken(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.token:
-            self.token = make_random_letters_string(40)
+            self.token = make_random_letters_and_digit_string(60)
 
         super(ApiToken, self).save(force_insert, force_update, using, update_fields)

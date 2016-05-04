@@ -21,7 +21,7 @@ class ApiTestCase(TestCase):
     def test_add_new_game_record(self):
         token = ApiToken.objects.create(user=self.user)
         data = {
-            'id': '2016050122gm-0009-7999-x3b3ca93e0c99&tw=2',
+            'id': '2016050122gm-0009-7999-x3b3ca93e0c99',
             'position': 1
         }
         response = self.client.post(reverse('api_add_tenhou_game'), {'data': json.dumps(data)},

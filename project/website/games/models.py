@@ -12,12 +12,19 @@ class Game(models.Model):
         (TENHOU, 'Tenhou.net log'),
     )
 
+    TONPUSEN = 0
+    RULES = (
+        (TONPUSEN, 'Tonpu-sen'),
+    )
+
     player = models.ForeignKey(Player, related_name='games')
     type = models.PositiveSmallIntegerField(choices=TYPES, default=TENHOU)
+    game_rule = models.PositiveSmallIntegerField(choices=RULES, default=TONPUSEN)
 
     external_id = models.TextField(default='', null=True, blank=True)
     player_position = models.PositiveSmallIntegerField(default=0)
     scores = models.SmallIntegerField(default=0)
+    seat = models.PositiveSmallIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -25,3 +32,6 @@ class Game(models.Model):
     class Meta:
         db_table = 'mahjong_game'
         ordering = ['-created_at']
+
+    def get_tenhou_url(self):
+        return 'http://tenhou.net/0/?log={0}&tw={1}'.format(self.external_id, self.seat)

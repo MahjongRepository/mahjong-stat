@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <div class="page-header">
+        <h3>{{ player.username }}</h3>
+    </div>
+    <div>
+        <p>Average position: {{ average_position|floatformat:2 }}</p>
+        <p>Latest 10 games</p>
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Log</th>
+                <th>Position</th>
+                <th>Scores</th>
+                <th>Date</th>
+            </tr>
+            {% for game in games %}
+                <tr>
+                    <td>
+                        <a href="{{ game.get_tenhou_url }}" target="_blank">
+                            {{ game.get_tenhou_url }}
+                        </a>
+                    </td>
+                    <td>{{ game.player_position }}</td>
+                    <td>{{ game.scores|intcomma }}</td>
+                    <td>{{ game.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{% endblock %}
