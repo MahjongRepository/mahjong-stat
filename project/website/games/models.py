@@ -12,14 +12,16 @@ class Game(models.Model):
         (TENHOU, 'Tenhou.net log'),
     )
 
-    TONPUSEN = 0
+    TONPUSEN_ARI_ARI = 0
+    HANCHAN_ARI_ARI = 0
     RULES = (
-        (TONPUSEN, 'Tonpu-sen'),
+        (TONPUSEN_ARI_ARI, 'Tonpu-sen. Ari, Ari.'),
+        (HANCHAN_ARI_ARI, 'Hanchan. Ari, Ari.'),
     )
 
     player = models.ForeignKey(Player, related_name='games')
     type = models.PositiveSmallIntegerField(choices=TYPES, default=TENHOU)
-    game_rule = models.PositiveSmallIntegerField(choices=RULES, default=TONPUSEN)
+    game_rule = models.PositiveSmallIntegerField(choices=RULES, default=TONPUSEN_ARI_ARI)
 
     external_id = models.TextField(default='', null=True, blank=True)
     player_position = models.PositiveSmallIntegerField(default=0)

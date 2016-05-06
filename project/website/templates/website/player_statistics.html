@@ -11,6 +11,7 @@
         <table class="table table-bordered table-striped">
             <tr>
                 <th>Log</th>
+                <th>Type</th>
                 <th>Position</th>
                 <th>Scores</th>
                 <th>Date</th>
@@ -22,7 +23,7 @@
                             {{ game.get_tenhou_url }}
                         </a>
                     </td>
-                    <td>{{ game.player_position }}</td>
+                    <td>{{ game.get_game_rule_display }}</td>
                     <td>{{ game.scores|intcomma }}</td>
                     <td>{{ game.created_at }}</td>
                 </tr>
