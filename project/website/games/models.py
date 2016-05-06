@@ -13,7 +13,7 @@ class Game(models.Model):
     )
 
     TONPUSEN_ARI_ARI = 0
-    HANCHAN_ARI_ARI = 0
+    HANCHAN_ARI_ARI = 1
     RULES = (
         (TONPUSEN_ARI_ARI, 'Tonpu-sen. Ari, Ari.'),
         (HANCHAN_ARI_ARI, 'Hanchan. Ari, Ari.'),
