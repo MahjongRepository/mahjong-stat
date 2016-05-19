@@ -8,3 +8,5 @@ logs
 collected_static
 local_settings.py
 mahjong.db
+
+tests_temp_data

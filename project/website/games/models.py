@@ -9,7 +9,7 @@ class Game(models.Model):
 
     TYPES = (
         (REAL_LIFE, 'Real life game record'),
-        (TENHOU, 'Tenhou.net log'),
+        (TENHOU, 'Tenhou game'),
     )
 
     TONPUSEN_ARI_ARI = 0
