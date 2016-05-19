@@ -36,4 +36,5 @@ class Game(models.Model):
         ordering = ['-created_at']
 
     def get_tenhou_url(self):
-        return 'http://tenhou.net/0/?log={0}&tw={1}'.format(self.external_id, self.seat)
+        decoded_seat = (4 - self.seat) % 4
+        return 'http://tenhou.net/0/?log={0}&tw={1}'.format(self.external_id, decoded_seat)
