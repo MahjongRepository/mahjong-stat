@@ -1,5 +1,3 @@
-import json
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -20,18 +18,20 @@ def add_tenhou_game(request):
 
     results = TenhouLogParser().parse_log(log_id)
 
-    player = next((i for i in results if i['name'] in usernames), None)
+    player = next((i for i in results['players'] if i['name'] in usernames), None)
     if not player:
         return JsonResponse({'success': False})
 
     Game.objects.create(
         player=players.get(username=player['name']),
-        type=Game.TENHOU,
         external_id=log_id,
         player_position=player['position'],
         scores=player['scores'],
         seat=player['seat'],
+        game=Game.TENHOU,
         game_rule=Game.HANCHAN_ARI_ARI,
+        game_type=Game.FOUR_PLAYERS,
+        game_log_content=results['log_data']
     )
 
     return JsonResponse({'success': True})

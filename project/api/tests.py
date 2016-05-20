@@ -1,5 +1,3 @@
-import json
-
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 
@@ -33,14 +31,14 @@ class ApiTestCase(TestCase):
         self.assertEqual(games.count(), 1)
         self.assertEqual(games[0].external_id, data['id'])
         self.assertEqual(games[0].player_position, 2)
+        self.assertNotEqual(games[0].game_log_content, '')
 
     def test_add_new_tenhou_game_without_id(self):
         token = ApiToken.objects.create(user=self.user)
         data = {
             'id': '',
         }
-        response = self.client.post(reverse('api_add_tenhou_game'), {'data': data},
-                                    **{'HTTP_TOKEN': token.token})
+        response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['success'], False)
 
@@ -51,8 +49,7 @@ class ApiTestCase(TestCase):
         data = {
             'id': '1',
         }
-        response = self.client.post(reverse('api_add_tenhou_game'), {'data': data},
-                                    **{'HTTP_TOKEN': token.token})
+        response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['success'], False)
 

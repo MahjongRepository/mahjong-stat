@@ -13,7 +13,7 @@ logs_temp_directory = os.path.join(settings.BASE_DIR, 'tests_temp_data')
 class TenhouLogParser(object):
 
     def parse_log(self, log_id):
-        players = []
+        player_names = []
         scores = []
 
         log_data = self._get_log_data(log_id)
@@ -23,20 +23,20 @@ class TenhouLogParser(object):
         elements = soup.find_all()
         for tag in elements:
             if tag.name == 'un' and 'rate' in tag.attrs:
-                players = self.parse_names(tag)
+                player_names = self.parse_names(tag)
 
             if 'owari' in tag.attrs:
                 scores, _ = self.parse_final_scored(tag)
 
-        results = []
+        players = []
+        for i in range(0, len(player_names)):
+            players.append({'name': player_names[i], 'scores': int(scores[i] * 100), 'seat': i + 1})
+
+        players = sorted(players, key=lambda x: x['scores'], reverse=True)
         for i in range(0, len(players)):
-            results.append({'name': players[i], 'scores': int(scores[i] * 100), 'seat': i + 1})
+            players[i]['position'] = i + 1
 
-        results = sorted(results, key=lambda x: x['scores'], reverse=True)
-        for i in range(0, len(results)):
-            results[i]['position'] = i + 1
-
-        return results
+        return {'players': players, 'log_data': log_data}
 
     def parse_names(self, tag):
         return [
