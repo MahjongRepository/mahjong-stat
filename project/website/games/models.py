@@ -14,7 +14,7 @@ class Game(models.Model, MahjongConstants):
 
     player = models.ForeignKey(Player, related_name='games')
 
-    game = models.PositiveSmallIntegerField(choices=GAMES, default=TENHOU)
+    game_place = models.PositiveSmallIntegerField(choices=GAMES, default=TENHOU)
     game_rule = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_RULES, default=MahjongConstants.UNKNOWN)
     game_type = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_TYPES, default=MahjongConstants.UNKNOWN)
     lobby = models.PositiveSmallIntegerField(default=0)
@@ -34,7 +34,7 @@ class Game(models.Model, MahjongConstants):
 
     class Meta:
         db_table = 'mahjong_game'
-        ordering = ['-created_at']
+        ordering = ['-game_date']
 
     def get_tenhou_url(self):
         seat = self.seat - 1

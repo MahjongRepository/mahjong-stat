@@ -28,7 +28,7 @@ class TenhouLogParser(MahjongConstants):
 
             game_date = log_id.split('-')[0]
             #2016052113gm
-            game_date = datetime.strptime(game_date, '%Y%m%d%Hgm')
+            game_date = datetime.strptime(game_date, '%Y%m%d%Hgm').replace(tzinfo=timezone.utc)
 
         if not log_data:
             return []

@@ -1,6 +1,7 @@
 import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 
 from tenhou_log_parser.constants import MahjongConstants
 from tenhou_log_parser.main import TenhouLogParser
@@ -135,4 +136,4 @@ class ParserTestCase(TestCase):
 
     def test_parse_game_date(self):
         results = TenhouLogParser().parse_log(log_id='2016051813gm-0001-0000-d455c767')
-        self.assertEqual(results['game_date'], datetime.datetime(2016, 5, 18, 13, 0))
+        self.assertEqual(results['game_date'], datetime.datetime(2016, 5, 18, 13, 0, tzinfo=timezone.utc))
