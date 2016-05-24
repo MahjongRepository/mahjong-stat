@@ -29,8 +29,9 @@ def add_tenhou_game(request):
         scores=player['scores'],
         seat=player['seat'],
         game=Game.TENHOU,
-        game_rule=Game.HANCHAN_ARI_ARI,
-        game_type=Game.FOUR_PLAYERS,
+        game_rule=results['game_rule'],
+        game_type=results['game_type'],
+        lobby=results['lobby'],
         game_log_content=results['log_data']
     )
 

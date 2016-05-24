@@ -7,16 +7,24 @@ import struct
 from bs4 import BeautifulSoup
 from django.conf import settings
 
+from tenhou_log_parser.constants import MahjongConstants
+
 logs_temp_directory = os.path.join(settings.BASE_DIR, 'tests_temp_data')
 
 
-class TenhouLogParser(object):
+class TenhouLogParser(MahjongConstants):
 
-    def parse_log(self, log_id):
+    def parse_log(self, log_id=None, log_data=None):
         player_names = []
         scores = []
+        lobby = 0
+        game_rule = self.UNKNOWN
 
-        log_data = self._get_log_data(log_id)
+        if log_id:
+            log_data = self._get_log_data(log_id)
+
+        if not log_data:
+            return []
 
         # tenhou produced not valid XML, so let's use BeautifulSoup for parsing
         soup = BeautifulSoup(log_data, 'html.parser')
@@ -28,6 +36,12 @@ class TenhouLogParser(object):
             if 'owari' in tag.attrs:
                 scores, _ = self.parse_final_scored(tag)
 
+            if tag.name == 'go':
+                lobby, game_rule = self.parse_game_lobby_and_rule(tag)
+
+        if not scores:
+            scores = [0] * len(player_names)
+
         players = []
         for i in range(0, len(player_names)):
             players.append({'name': player_names[i], 'scores': int(scores[i] * 100), 'seat': i + 1})
@@ -36,15 +50,46 @@ class TenhouLogParser(object):
         for i in range(0, len(players)):
             players[i]['position'] = i + 1
 
-        return {'players': players, 'log_data': log_data}
+        game_type = self.FOUR_PLAYERS
+        if len(players) == 3:
+            game_type = self.THREE_PLAYERS
+
+        return {
+            'lobby': lobby,
+            'game_type': game_type,
+            'game_rule': game_rule,
+            'players': players,
+            'log_data': log_data,
+        }
+
+    def parse_game_lobby_and_rule(self, tag):
+        lobby = int(tag.attrs['lobby'])
+        game_rule_temp = int(tag.attrs['type'])
+
+        game_rule_dictionary = {
+            1: self.TONPUSEN_TANYAO_RED_FIVES,
+            9: self.HANCHAN_TANYAO_RED_FIVES,
+            # hirosima
+            25: self.HANCHAN_TANYAO_RED_FIVES,
+        }
+
+        game_rule = game_rule_temp in game_rule_dictionary and game_rule_dictionary[game_rule_temp] or self.UNKNOWN
+
+        return lobby, game_rule
 
     def parse_names(self, tag):
-        return [
+        result = [
             unquote(tag.attrs['n0']),
             unquote(tag.attrs['n1']),
             unquote(tag.attrs['n2']),
             unquote(tag.attrs['n3'])
         ]
+
+        # we are in hirosima game (for three players)
+        if not result[-1]:
+            del result[-1]
+
+        return result
 
     def parse_final_scored(self, tag):
         data = tag.attrs['owari']

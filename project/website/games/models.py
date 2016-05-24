@@ -1,35 +1,23 @@
 from django.db import models
 
+from tenhou_log_parser.constants import MahjongConstants
 from website.accounts.models import User, Player
 
 
-class Game(models.Model):
-    REAL_LIFE = 0
-    TENHOU = 1
+class Game(models.Model, MahjongConstants):
+    REAL_LIFE = 1
+    TENHOU = 2
     GAMES = (
         (REAL_LIFE, 'Real life game record'),
         (TENHOU, 'Tenhou game'),
     )
 
-    FOUR_PLAYERS = 0
-    THREE_PLAYERS = 1
-    GAME_TYPES = (
-        (FOUR_PLAYERS, 'Standard game'),
-        (THREE_PLAYERS, 'Hirosima'),
-    )
-
-    TONPUSEN_ARI_ARI = 0
-    HANCHAN_ARI_ARI = 1
-    GAME_RULES = (
-        (TONPUSEN_ARI_ARI, 'Tonpu-sen. Ari, Ari.'),
-        (HANCHAN_ARI_ARI, 'Hanchan. Ari, Ari.'),
-    )
-
     player = models.ForeignKey(Player, related_name='games')
 
     game = models.PositiveSmallIntegerField(choices=GAMES, default=TENHOU)
-    game_rule = models.PositiveSmallIntegerField(choices=GAME_RULES, default=TONPUSEN_ARI_ARI)
-    game_type = models.PositiveSmallIntegerField(choices=GAME_TYPES, default=FOUR_PLAYERS)
+    game_rule = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_RULES, default=MahjongConstants.UNKNOWN)
+    game_type = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_TYPES, default=MahjongConstants.UNKNOWN)
+    lobby = models.PositiveSmallIntegerField(default=0)
 
     # let's store all games contents
     # to be able rebuild statistics in future without a lot of downloads from tenhou servers
