@@ -18,6 +18,7 @@ class Game(models.Model, MahjongConstants):
     game_rule = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_RULES, default=MahjongConstants.UNKNOWN)
     game_type = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_TYPES, default=MahjongConstants.UNKNOWN)
     lobby = models.PositiveSmallIntegerField(default=0)
+    game_date = models.DateTimeField(default=None, null=True, blank=True)
 
     # let's store all games contents
     # to be able rebuild statistics in future without a lot of downloads from tenhou servers

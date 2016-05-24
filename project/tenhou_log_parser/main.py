@@ -1,3 +1,4 @@
+from datetime import datetime
 from urllib.parse import unquote
 from urllib.request import urlopen
 
@@ -6,6 +7,7 @@ import os
 import struct
 from bs4 import BeautifulSoup
 from django.conf import settings
+from django.utils import timezone
 
 from tenhou_log_parser.constants import MahjongConstants
 
@@ -19,9 +21,14 @@ class TenhouLogParser(MahjongConstants):
         scores = []
         lobby = 0
         game_rule = self.UNKNOWN
+        game_date = timezone.now()
 
         if log_id:
             log_data = self._get_log_data(log_id)
+
+            game_date = log_id.split('-')[0]
+            #2016052113gm
+            game_date = datetime.strptime(game_date, '%Y%m%d%Hgm')
 
         if not log_data:
             return []
@@ -60,6 +67,7 @@ class TenhouLogParser(MahjongConstants):
             'game_rule': game_rule,
             'players': players,
             'log_data': log_data,
+            'game_date': game_date
         }
 
     def parse_game_lobby_and_rule(self, tag):

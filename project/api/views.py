@@ -31,6 +31,7 @@ def add_tenhou_game(request):
         game=Game.TENHOU,
         game_rule=results['game_rule'],
         game_type=results['game_type'],
+        game_date=results['game_date'],
         lobby=results['lobby'],
         game_log_content=results['log_data']
     )
