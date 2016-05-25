@@ -22,6 +22,7 @@ class TenhouLogParser(MahjongConstants):
         lobby = 0
         game_rule = self.UNKNOWN
         game_date = timezone.now()
+        rounds = []
 
         if log_id:
             log_data = self._get_log_data(log_id)
@@ -46,12 +47,21 @@ class TenhouLogParser(MahjongConstants):
             if tag.name == 'go':
                 lobby, game_rule = self.parse_game_lobby_and_rule(tag)
 
+            if tag.name == 'init':
+                # is not implemented yet
+                rounds.append({})
+
         if not scores:
             scores = [0] * len(player_names)
 
         players = []
         for i in range(0, len(player_names)):
-            players.append({'name': player_names[i], 'scores': int(scores[i] * 100), 'seat': i + 1})
+            players.append({
+                'name': player_names[i],
+                'scores': int(scores[i] * 100),
+                'seat': i + 1,
+                'rounds': rounds
+            })
 
         players = sorted(players, key=lambda x: x['scores'], reverse=True)
         for i in range(0, len(players)):

@@ -7,10 +7,13 @@ from tenhou_log_parser.constants import MahjongConstants
 from tenhou_log_parser.main import TenhouLogParser
 
 
-class ParserTestCase(TestCase):
+class TestCaseMixin(object):
 
     def _prepare_data(self, data):
         return data.replace('\n', '').replace('        ', '')
+
+
+class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
 
     def test_parse_final_scores(self):
         data = self._prepare_data("""
@@ -137,3 +140,20 @@ class ParserTestCase(TestCase):
     def test_parse_game_date(self):
         results = TenhouLogParser().parse_log(log_id='2016051813gm-0001-0000-d455c767')
         self.assertEqual(results['game_date'], datetime.datetime(2016, 5, 18, 13, 0, tzinfo=timezone.utc))
+
+
+class ParseRoundTestCase(TestCase, TestCaseMixin):
+
+    def test_parse_count_of_rounds(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT seed="0,0,0,5,2,130" ten="250,250,250,250" oya="0" hai0="105,53,123,127,108,82,18,58,71,75,68,49,36" hai1="64,50,73,109,99,26,16,91,30,17,92,118,87" hai2="70,65,21,33,6,94,59,110,83,39,10,14,47" hai3="126,133,61,51,122,0,89,67,81,40,100,3,4"/>
+        <T76/><D123/><U125/>
+        <INIT seed="0,0,0,5,2,130" ten="250,250,250,250" oya="0" hai0="105,53,123,127,108,82,18,58,71,75,68,49,36" hai1="64,50,73,109,99,26,16,91,30,17,92,118,87" hai2="70,65,21,33,6,94,59,110,83,39,10,14,47" hai3="126,133,61,51,122,0,89,67,81,40,100,3,4"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+        for player in results['players']:
+            self.assertEqual(len(player['rounds']), 2)

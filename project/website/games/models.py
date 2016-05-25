@@ -39,3 +39,23 @@ class Game(models.Model, MahjongConstants):
     def get_tenhou_url(self):
         seat = self.seat - 1
         return 'http://tenhou.net/0/?log={0}&tw={1}'.format(self.external_id, seat)
+
+
+class GameRound(models.Model):
+    game = models.ForeignKey(Game, related_name='rounds')
+
+    is_win = models.BooleanField(default=False)
+    # deal to ron
+    is_deal = models.BooleanField(default=False)
+    is_retake = models.BooleanField(default=False)
+
+    is_tsumo = models.BooleanField(default=False)
+    is_riichi = models.BooleanField(default=False)
+    is_open_hand = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'mahjong_game_round'
+        ordering = ['-created_at']
