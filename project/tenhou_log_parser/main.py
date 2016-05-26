@@ -38,6 +38,8 @@ class TenhouLogParser(MahjongConstants):
         soup = BeautifulSoup(log_data, 'html.parser')
         elements = soup.find_all()
         for tag in elements:
+            round = {}
+
             if tag.name == 'un' and 'rate' in tag.attrs:
                 player_names = self.parse_names(tag)
 
@@ -47,25 +49,39 @@ class TenhouLogParser(MahjongConstants):
             if tag.name == 'go':
                 lobby, game_rule = self.parse_game_lobby_and_rule(tag)
 
-            if tag.name == 'init':
-                # is not implemented yet
-                rounds.append({})
+            if tag.name == 'agari':
+                winner = tag.attrs['who']
+                from_who = tag.attrs['fromwho']
+                rounds.append({
+                    'winner': winner,
+                    'from_who': from_who
+                })
 
         if not scores:
             scores = [0] * len(player_names)
 
         players = []
-        for i in range(0, len(player_names)):
+        for player_seat in range(0, len(player_names)):
+
+            player_rounds = []
+            for round in rounds:
+                is_winner = round['who'] == player_seat
+                is_loser = round['from_who'] == player_seat
+                player_rounds.append({
+                    'is_win': is_winner,
+                    'is_deal': is_loser
+                })
+
             players.append({
-                'name': player_names[i],
-                'scores': int(scores[i] * 100),
-                'seat': i + 1,
-                'rounds': rounds
+                'name': player_names[player_seat],
+                'scores': int(scores[player_seat] * 100),
+                'seat': player_seat + 1,
+                'rounds': player_rounds
             })
 
         players = sorted(players, key=lambda x: x['scores'], reverse=True)
-        for i in range(0, len(players)):
-            players[i]['position'] = i + 1
+        for player_seat in range(0, len(players)):
+            players[player_seat]['position'] = player_seat + 1
 
         game_type = self.FOUR_PLAYERS
         if len(players) == 3:

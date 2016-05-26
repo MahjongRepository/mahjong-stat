@@ -144,13 +144,15 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
 
 class ParseRoundTestCase(TestCase, TestCaseMixin):
 
-    def test_parse_count_of_rounds(self):
+    def test_parse_rounds_and_agari(self):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT seed="0,0,0,5,2,130" ten="250,250,250,250" oya="0" hai0="105,53,123,127,108,82,18,58,71,75,68,49,36" hai1="64,50,73,109,99,26,16,91,30,17,92,118,87" hai2="70,65,21,33,6,94,59,110,83,39,10,14,47" hai3="126,133,61,51,122,0,89,67,81,40,100,3,4"/>
+        <INIT/>
+        <AGARI who="0" fromWho="1" />
         <T76/><D123/><U125/>
-        <INIT seed="0,0,0,5,2,130" ten="250,250,250,250" oya="0" hai0="105,53,123,127,108,82,18,58,71,75,68,49,36" hai1="64,50,73,109,99,26,16,91,30,17,92,118,87" hai2="70,65,21,33,6,94,59,110,83,39,10,14,47" hai3="126,133,61,51,122,0,89,67,81,40,100,3,4"/>
+        <INIT/>
+        <AGARI who="2" fromWho="1" />
         </mjloggm>
         """)
 
