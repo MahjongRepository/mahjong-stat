@@ -27,22 +27,22 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         results = TenhouLogParser().parse_log(log_data=data)
         self.assertEqual(len(results['players']), 4)
 
-        self.assertEqual(results['players'][0]['seat'], 1)
+        self.assertEqual(results['players'][0]['seat'], 0)
         self.assertEqual(results['players'][0]['name'], 'NoName1')
         self.assertEqual(results['players'][0]['position'], 1)
         self.assertEqual(results['players'][0]['scores'], 38200)
 
-        self.assertEqual(results['players'][1]['seat'], 2)
+        self.assertEqual(results['players'][1]['seat'], 1)
         self.assertEqual(results['players'][1]['name'], 'NoName2')
         self.assertEqual(results['players'][1]['position'], 2)
         self.assertEqual(results['players'][1]['scores'], 36200)
 
-        self.assertEqual(results['players'][2]['seat'], 4)
+        self.assertEqual(results['players'][2]['seat'], 3)
         self.assertEqual(results['players'][2]['name'], 'NoName4')
         self.assertEqual(results['players'][2]['position'], 3)
         self.assertEqual(results['players'][2]['scores'], 15200)
 
-        self.assertEqual(results['players'][3]['seat'], 3)
+        self.assertEqual(results['players'][3]['seat'], 2)
         self.assertEqual(results['players'][3]['name'], 'NoName3')
         self.assertEqual(results['players'][3]['position'], 4)
         self.assertEqual(results['players'][3]['scores'], 10400)
@@ -144,18 +144,192 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
 
 class ParseRoundTestCase(TestCase, TestCaseMixin):
 
-    def test_parse_rounds_and_agari(self):
+    def test_rounds_and_agari(self):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
         <INIT/>
+        <T76/><D123/><U125/>
         <AGARI who="0" fromWho="1" />
         <T76/><D123/><U125/>
         <INIT/>
-        <AGARI who="2" fromWho="1" />
+        <T76/><D123/><U125/>
+        <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
         </mjloggm>
         """)
 
         results = TenhouLogParser().parse_log(log_data=data)
+
         for player in results['players']:
             self.assertEqual(len(player['rounds']), 2)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['is_win'], True)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+        self.assertEqual(player['rounds'][0]['is_tsumo'], False)
+        self.assertEqual(player['rounds'][0]['is_retake'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][0]['is_win'], False)
+        self.assertEqual(player['rounds'][0]['is_deal'], True)
+        self.assertEqual(player['rounds'][0]['is_tsumo'], False)
+        self.assertEqual(player['rounds'][0]['is_retake'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 2), None)
+        self.assertEqual(player['rounds'][1]['is_win'], True)
+        self.assertEqual(player['rounds'][1]['is_deal'], False)
+        self.assertEqual(player['rounds'][1]['is_tsumo'], False)
+        self.assertEqual(player['rounds'][1]['is_retake'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][1]['is_win'], False)
+        self.assertEqual(player['rounds'][1]['is_deal'], True)
+        self.assertEqual(player['rounds'][1]['is_tsumo'], False)
+        self.assertEqual(player['rounds'][1]['is_retake'], False)
+
+    def test_rounds_and_tsumo(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT/>
+        <T76/><D123/><U125/>
+        <AGARI who="0" fromWho="0" owari="1,2,3,4,5,6,7,8"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['is_win'], True)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+        self.assertEqual(player['rounds'][0]['is_tsumo'], True)
+        self.assertEqual(player['rounds'][0]['is_retake'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 2), None)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 3), None)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+
+    def test_rounds_and_retake(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT/>
+        <T76/><D123/><U125/>
+        <AGARI who="0" fromWho="0" />
+        <INIT/>
+        <T76/><D123/><U125/>
+        <RYUUKYOKU type="yao9" ba="0,0" sc="433,0,266,0,250,0,51,0" hai3="14,20,32,36,38,65,66,68,106,109,114,121,126,132" owari="1,2,3,4,5,6,7,8"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][1]['is_deal'], False)
+        self.assertEqual(player['rounds'][1]['is_retake'], True)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][1]['is_deal'], False)
+        self.assertEqual(player['rounds'][1]['is_retake'], True)
+
+        player = next((i for i in results['players'] if i['seat'] == 2), None)
+        self.assertEqual(player['rounds'][1]['is_deal'], False)
+        self.assertEqual(player['rounds'][1]['is_retake'], True)
+
+        player = next((i for i in results['players'] if i['seat'] == 3), None)
+        self.assertEqual(player['rounds'][1]['is_deal'], False)
+        self.assertEqual(player['rounds'][1]['is_retake'], True)
+
+    def test_rounds_and_double_ron(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT/>
+        <T76/><D123/><U125/>
+        <AGARI who="0" fromWho="2" />
+        <AGARI who="1" fromWho="2" owari="1,2,3,4,5,6,7,8"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+
+        for player in results['players']:
+            self.assertEqual(len(player['rounds']), 1)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['is_win'], True)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][0]['is_win'], True)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 2), None)
+        self.assertEqual(player['rounds'][0]['is_win'], False)
+        self.assertEqual(player['rounds'][0]['is_deal'], True)
+
+        player = next((i for i in results['players'] if i['seat'] == 3), None)
+        self.assertEqual(player['rounds'][0]['is_win'], False)
+        self.assertEqual(player['rounds'][0]['is_deal'], False)
+
+    def test_rounds_and_open_hand(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT/>
+        <T76/><D123/><U125/><N who="3" m="24815" />
+        <AGARI who="0" fromWho="2" />
+        <INIT/>
+        <T76/><D123/><U125/><N who="2" m="6167" />
+        <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+
+        for player in results['players']:
+            self.assertEqual(len(player['rounds']), 2)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['is_open_hand'], False)
+        self.assertEqual(player['rounds'][1]['is_open_hand'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][0]['is_open_hand'], False)
+        self.assertEqual(player['rounds'][1]['is_open_hand'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 2), None)
+        self.assertEqual(player['rounds'][0]['is_open_hand'], False)
+        self.assertEqual(player['rounds'][1]['is_open_hand'], True)
+
+        player = next((i for i in results['players'] if i['seat'] == 3), None)
+        self.assertEqual(player['rounds'][0]['is_open_hand'], True)
+        self.assertEqual(player['rounds'][1]['is_open_hand'], False)
+
+    def test_rounds_and_open_hand_and_closed_kan(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT/>
+        <T76/><D123/><U125/><N who="0" m="33280" /><DORA hai="21" />
+        <AGARI who="2" fromWho="1"/>
+        <INIT/>
+        <T76/><D123/><U125/><N who="1" m="33280" /><T76/><DORA hai="21" />
+        <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['is_open_hand'], False)
+        self.assertEqual(player['rounds'][1]['is_open_hand'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][0]['is_open_hand'], False)
+        self.assertEqual(player['rounds'][1]['is_open_hand'], True)

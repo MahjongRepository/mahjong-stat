@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import tee
 from urllib.parse import unquote
 from urllib.request import urlopen
 
@@ -37,8 +38,9 @@ class TenhouLogParser(MahjongConstants):
         # tenhou produced not valid XML, so let's use BeautifulSoup for parsing
         soup = BeautifulSoup(log_data, 'html.parser')
         elements = soup.find_all()
+        round = {}
+        who_open_hand = []
         for tag in elements:
-            round = {}
 
             if tag.name == 'un' and 'rate' in tag.attrs:
                 player_names = self.parse_names(tag)
@@ -50,12 +52,37 @@ class TenhouLogParser(MahjongConstants):
                 lobby, game_rule = self.parse_game_lobby_and_rule(tag)
 
             if tag.name == 'agari':
-                winner = tag.attrs['who']
-                from_who = tag.attrs['fromwho']
-                rounds.append({
-                    'winner': winner,
-                    'from_who': from_who
-                })
+                winner = int(tag.attrs['who'])
+                from_who = int(tag.attrs['fromwho'])
+
+                if round:
+                    round['winners'].append(winner)
+                else:
+                    round = {
+                        'winners': [winner],
+                        'from_who': from_who,
+                        'who_open_hand': who_open_hand,
+                        'is_retake': False
+                    }
+
+            if tag.name == 'ryuukyoku':
+                round = {'is_retake': True}
+
+            if tag.name == 'n':
+                index = elements.index(tag)
+                next_tag = elements[index + 1]
+                # for closed kan next tag will be dora tag
+                # in that case we don't need to count this hand as opened
+                if next_tag.name != 'dora':
+                    who_open_hand.append(int(tag.attrs['who']))
+
+            # because of double ron, we can push round information
+            # after new round started
+            # or after the end of game
+            if round and (tag.name == 'init' or 'owari' in tag.attrs):
+                rounds.append(round)
+                round = {}
+                who_open_hand = []
 
         if not scores:
             scores = [0] * len(player_names)
@@ -65,17 +92,31 @@ class TenhouLogParser(MahjongConstants):
 
             player_rounds = []
             for round in rounds:
-                is_winner = round['who'] == player_seat
-                is_loser = round['from_who'] == player_seat
-                player_rounds.append({
-                    'is_win': is_winner,
-                    'is_deal': is_loser
-                })
+                data = {
+                    'is_win': False,
+                    'is_deal': False,
+                    'is_tsumo': False,
+                    'is_retake': False,
+                    'is_open_hand': False
+                }
+
+                if round['is_retake']:
+                    data['is_retake'] = True
+                else:
+                    is_winner = player_seat in round['winners']
+                    is_loser = round['from_who'] not in round['winners'] and round['from_who'] == player_seat
+
+                    data['is_win'] = is_winner
+                    data['is_deal'] = is_loser
+                    data['is_tsumo'] = is_winner and round['from_who'] in round['winners']
+                    data['is_open_hand'] = player_seat in round['who_open_hand']
+
+                player_rounds.append(data)
 
             players.append({
                 'name': player_names[player_seat],
                 'scores': int(scores[player_seat] * 100),
-                'seat': player_seat + 1,
+                'seat': player_seat,
                 'rounds': player_rounds
             })
 
