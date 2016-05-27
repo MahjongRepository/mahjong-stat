@@ -29,7 +29,7 @@ class TenhouLogParser(MahjongConstants):
             log_data = self._get_log_data(log_id)
 
             game_date = log_id.split('-')[0]
-            #2016052113gm
+            # 2016052113gm
             game_date = datetime.strptime(game_date, '%Y%m%d%Hgm').replace(tzinfo=timezone.utc)
 
         if not log_data:
@@ -38,37 +38,58 @@ class TenhouLogParser(MahjongConstants):
         # tenhou produced not valid XML, so let's use BeautifulSoup for parsing
         soup = BeautifulSoup(log_data, 'html.parser')
         elements = soup.find_all()
-        round = {}
+
+        round_data = {}
         who_open_hand = []
         who_called_riichi = []
+        round_number = 0
+        honba = 0
+
         for tag in elements:
+
+            if tag.name == 'init':
+                seed = tag.attrs['seed'].split(',')
+                seed = [int(i) for i in seed]
+
+                round_number = seed[0]
+                honba = seed[1]
 
             if tag.name == 'un' and 'rate' in tag.attrs:
                 player_names = self.parse_names(tag)
 
+            # the final result
             if 'owari' in tag.attrs:
-                scores, _ = self.parse_final_scored(tag)
+                scores, _ = self.parse_final_scores(tag)
 
+            # start of the game
             if tag.name == 'go':
                 lobby, game_rule = self.parse_game_lobby_and_rule(tag)
 
+            # someone is win
             if tag.name == 'agari':
                 winner = int(tag.attrs['who'])
                 from_who = int(tag.attrs['fromwho'])
 
-                if round:
-                    round['winners'].append(winner)
+                if round_data:
+                    round_data['winners'].append(winner)
                 else:
-                    round = {
+                    round_data = {
                         'winners': [winner],
                         'from_who': from_who,
                         'who_open_hand': who_open_hand,
                         'who_called_riichi': who_called_riichi,
-                        'is_retake': False
+                        'is_retake': False,
+                        'round_number': round_number,
+                        'honba': honba,
                     }
 
+            # retake
             if tag.name == 'ryuukyoku':
-                round = {'is_retake': True}
+                round_data = {
+                    'is_retake': True,
+                    'round_number': round_number,
+                    'honba': honba,
+                }
 
             if tag.name == 'n':
                 index = elements.index(tag)
@@ -78,15 +99,17 @@ class TenhouLogParser(MahjongConstants):
                 if next_tag.name != 'dora':
                     who_open_hand.append(int(tag.attrs['who']))
 
+            # when riichi confirmed (step 2)
+            # let's count it
             if tag.name == 'reach' and int(tag.attrs['step']) == 2:
                 who_called_riichi.append(int(tag.attrs['who']))
 
             # because of double ron, we can push round information
             # after new round started
             # or after the end of game
-            if round and (tag.name == 'init' or 'owari' in tag.attrs):
-                rounds.append(round)
-                round = {}
+            if round_data and (tag.name == 'init' or 'owari' in tag.attrs):
+                rounds.append(round_data)
+                round_data = {}
                 who_open_hand = []
                 who_called_riichi = []
 
@@ -97,27 +120,29 @@ class TenhouLogParser(MahjongConstants):
         for player_seat in range(0, len(player_names)):
 
             player_rounds = []
-            for round in rounds:
+            for round_data in rounds:
                 data = {
                     'is_win': False,
                     'is_deal': False,
                     'is_tsumo': False,
                     'is_retake': False,
                     'is_open_hand': False,
-                    'is_riichi': False
+                    'is_riichi': False,
+                    'round_number': round_data['round_number'],
+                    'honba': round_data['honba'],
                 }
 
-                if round['is_retake']:
+                if round_data['is_retake']:
                     data['is_retake'] = True
                 else:
-                    is_winner = player_seat in round['winners']
-                    is_loser = round['from_who'] not in round['winners'] and round['from_who'] == player_seat
+                    is_winner = player_seat in round_data['winners']
+                    is_loser = round_data['from_who'] not in round_data['winners'] and round_data['from_who'] == player_seat
 
                     data['is_win'] = is_winner
                     data['is_deal'] = is_loser
-                    data['is_tsumo'] = is_winner and round['from_who'] in round['winners']
-                    data['is_open_hand'] = player_seat in round['who_open_hand']
-                    data['is_riichi'] = player_seat in round['who_called_riichi']
+                    data['is_tsumo'] = is_winner and round_data['from_who'] in round_data['winners']
+                    data['is_open_hand'] = player_seat in round_data['who_open_hand']
+                    data['is_riichi'] = player_seat in round_data['who_called_riichi']
 
                 player_rounds.append(data)
 
@@ -174,7 +199,7 @@ class TenhouLogParser(MahjongConstants):
 
         return result
 
-    def parse_final_scored(self, tag):
+    def parse_final_scores(self, tag):
         data = tag.attrs['owari']
         data = [float(i) for i in data.split(',')]
 

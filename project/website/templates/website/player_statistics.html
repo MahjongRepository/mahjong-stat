@@ -31,7 +31,7 @@
                 <tr>
                     <td>
                         {% for round in game.rounds.all %}
-                            Round #{{ forloop.counter }}
+                            {{ round.round_number_display }}
 
                             {% if round.is_win %}
                                 Win ({{ round.is_tsumo|yesno:"tsumo,ron" }})

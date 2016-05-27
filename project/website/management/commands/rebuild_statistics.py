@@ -10,8 +10,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         players = Player.objects.all()
 
-        print(GameRound.objects.all().count())
-
         for player in players:
             games = player.games.all()
 
@@ -21,13 +19,15 @@ class Command(BaseCommand):
                 results = TenhouLogParser().parse_log(log_data=game.game_log_content)
                 player_result = next((i for i in results['players'] if i['name'] == player.username), None)
 
-                for round in player_result['rounds']:
+                for round_data in player_result['rounds']:
                     GameRound.objects.create(
                         game=game,
-                        is_win=round['is_win'],
-                        is_deal=round['is_deal'],
-                        is_retake=round['is_retake'],
-                        is_tsumo=round['is_tsumo'],
-                        is_riichi=round['is_riichi'],
-                        is_open_hand=round['is_open_hand'],
+                        is_win=round_data['is_win'],
+                        is_deal=round_data['is_deal'],
+                        is_retake=round_data['is_retake'],
+                        is_tsumo=round_data['is_tsumo'],
+                        is_riichi=round_data['is_riichi'],
+                        is_open_hand=round_data['is_open_hand'],
+                        round_number=round_data['round_number'],
+                        honba=round_data['honba']
                     )

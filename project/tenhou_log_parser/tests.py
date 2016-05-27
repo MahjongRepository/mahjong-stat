@@ -148,11 +148,11 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/>
         <AGARI who="0" fromWho="1" />
         <T76/><D123/><U125/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/>
         <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
         </mjloggm>
@@ -191,7 +191,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/>
         <AGARI who="0" fromWho="0" owari="1,2,3,4,5,6,7,8"/>
         </mjloggm>
@@ -218,10 +218,10 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/>
         <AGARI who="0" fromWho="0" />
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/>
         <RYUUKYOKU type="yao9" ba="0,0" sc="433,0,266,0,250,0,51,0" hai3="14,20,32,36,38,65,66,68,106,109,114,121,126,132" owari="1,2,3,4,5,6,7,8"/>
         </mjloggm>
@@ -249,7 +249,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/>
         <AGARI who="0" fromWho="2" />
         <AGARI who="1" fromWho="2" owari="1,2,3,4,5,6,7,8"/>
@@ -281,10 +281,10 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/><N who="3" m="24815" />
         <AGARI who="0" fromWho="2" />
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/><N who="2" m="6167" />
         <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
         </mjloggm>
@@ -315,10 +315,10 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/><N who="0" m="33280" /><DORA hai="21" />
         <AGARI who="2" fromWho="1"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/><N who="1" m="33280" /><T76/><DORA hai="21" />
         <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
         </mjloggm>
@@ -338,10 +338,10 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <REACH who="0" step="1"/><D47/><REACH who="0" ten="255,216,261,258" step="2"/>
         <AGARI who="2" fromWho="1"/>
-        <INIT/>
+        <INIT seed="1,0"/>
         <T76/><D123/><U125/><REACH who="0" step="1"/><D47/>
         <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
         </mjloggm>
@@ -364,3 +364,30 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         player = next((i for i in results['players'] if i['seat'] == 3), None)
         self.assertEqual(player['rounds'][0]['is_riichi'], False)
         self.assertEqual(player['rounds'][1]['is_riichi'], False)
+
+    def test_rounds_and_honba(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT seed="0,0"/>
+        <T76/><D123/><U125/>
+        <AGARI who="0" fromWho="1" />
+        <T76/><D123/><U125/>
+        <INIT seed="0,1"/>
+        <T76/><D123/><U125/>
+        <AGARI who="0" fromWho="1" />
+        <INIT seed="1,0"/>
+        <T76/><D123/><U125/>
+        <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['round_number'], 0)
+        self.assertEqual(player['rounds'][0]['honba'], 0)
+        self.assertEqual(player['rounds'][1]['round_number'], 0)
+        self.assertEqual(player['rounds'][1]['honba'], 1)
+        self.assertEqual(player['rounds'][2]['round_number'], 1)
+        self.assertEqual(player['rounds'][2]['honba'], 0)

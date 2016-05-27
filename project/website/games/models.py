@@ -52,9 +52,16 @@ class GameRound(models.Model):
     is_riichi = models.BooleanField(default=False)
     is_open_hand = models.BooleanField(default=False)
 
+    round_number = models.PositiveSmallIntegerField(default=0)
+    honba = models.PositiveSmallIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'mahjong_game_round'
-        ordering = ['-created_at']
+        ordering = ['round_number', 'honba']
+
+    def round_number_display(self):
+        rounds = [u'東', u'南', u'西', u'北']
+        return '{0}{1}'.format(rounds[self.round_number // 4], self.round_number + 1)
