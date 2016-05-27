@@ -28,6 +28,32 @@
                     <td>{{ game.scores|intcomma }}</td>
                     <td>{{ game.game_date }}</td>
                 </tr>
+                <tr>
+                    <td>
+                        {% for round in game.rounds.all %}
+                            Round #{{ forloop.counter }}
+
+                            {% if round.is_win %}
+                                Win ({{ round.is_tsumo|yesno:"tsumo,ron" }})
+                            {% endif %}
+
+                            {% if round.is_deal %}
+                                Deal to the hand
+                            {% endif %}
+
+                            {% if round.is_retake %}
+                                Retake
+                            {% endif %}
+
+                            {% if not round.is_win and not round.is_deal and not round.is_retake %}
+                                -
+                            {% endif %}
+
+                            <br>
+                        {% endfor %}
+                    </td>
+                    <td colspan="4"></td>
+                </tr>
             {% endfor %}
         </table>
     </div>

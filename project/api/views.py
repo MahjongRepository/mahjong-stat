@@ -18,16 +18,18 @@ def add_tenhou_game(request):
 
     results = TenhouLogParser().parse_log(log_id)
 
-    player = next((i for i in results['players'] if i['name'] in usernames), None)
-    if not player:
+    player_data = next((i for i in results['players'] if i['name'] in usernames), None)
+    if not player_data:
         return JsonResponse({'success': False})
 
+    player = players.get(username=player_data['name'])
+
     Game.objects.create(
-        player=players.get(username=player['name']),
+        player=player,
         external_id=log_id,
-        player_position=player['position'],
-        scores=player['scores'],
-        seat=player['seat'],
+        player_position=player_data['position'],
+        scores=player_data['scores'],
+        seat=player_data['seat'],
         game_place=Game.TENHOU,
         game_rule=results['game_rule'],
         game_type=results['game_type'],

@@ -40,6 +40,7 @@ class TenhouLogParser(MahjongConstants):
         elements = soup.find_all()
         round = {}
         who_open_hand = []
+        who_called_riichi = []
         for tag in elements:
 
             if tag.name == 'un' and 'rate' in tag.attrs:
@@ -62,6 +63,7 @@ class TenhouLogParser(MahjongConstants):
                         'winners': [winner],
                         'from_who': from_who,
                         'who_open_hand': who_open_hand,
+                        'who_called_riichi': who_called_riichi,
                         'is_retake': False
                     }
 
@@ -76,6 +78,9 @@ class TenhouLogParser(MahjongConstants):
                 if next_tag.name != 'dora':
                     who_open_hand.append(int(tag.attrs['who']))
 
+            if tag.name == 'reach' and int(tag.attrs['step']) == 2:
+                who_called_riichi.append(int(tag.attrs['who']))
+
             # because of double ron, we can push round information
             # after new round started
             # or after the end of game
@@ -83,6 +88,7 @@ class TenhouLogParser(MahjongConstants):
                 rounds.append(round)
                 round = {}
                 who_open_hand = []
+                who_called_riichi = []
 
         if not scores:
             scores = [0] * len(player_names)
@@ -97,7 +103,8 @@ class TenhouLogParser(MahjongConstants):
                     'is_deal': False,
                     'is_tsumo': False,
                     'is_retake': False,
-                    'is_open_hand': False
+                    'is_open_hand': False,
+                    'is_riichi': False
                 }
 
                 if round['is_retake']:
@@ -110,6 +117,7 @@ class TenhouLogParser(MahjongConstants):
                     data['is_deal'] = is_loser
                     data['is_tsumo'] = is_winner and round['from_who'] in round['winners']
                     data['is_open_hand'] = player_seat in round['who_open_hand']
+                    data['is_riichi'] = player_seat in round['who_called_riichi']
 
                 player_rounds.append(data)
 

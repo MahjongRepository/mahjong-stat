@@ -333,3 +333,34 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         player = next((i for i in results['players'] if i['seat'] == 1), None)
         self.assertEqual(player['rounds'][0]['is_open_hand'], False)
         self.assertEqual(player['rounds'][1]['is_open_hand'], True)
+
+    def test_rounds_and_call_riichi(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <INIT/>
+        <REACH who="0" step="1"/><D47/><REACH who="0" ten="255,216,261,258" step="2"/>
+        <AGARI who="2" fromWho="1"/>
+        <INIT/>
+        <T76/><D123/><U125/><REACH who="0" step="1"/><D47/>
+        <AGARI who="2" fromWho="1" owari="1,2,3,4,5,6,7,8"/>
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log(log_data=data)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['is_riichi'], True)
+        self.assertEqual(player['rounds'][1]['is_riichi'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 1), None)
+        self.assertEqual(player['rounds'][0]['is_riichi'], False)
+        self.assertEqual(player['rounds'][1]['is_riichi'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 2), None)
+        self.assertEqual(player['rounds'][0]['is_riichi'], False)
+        self.assertEqual(player['rounds'][1]['is_riichi'], False)
+
+        player = next((i for i in results['players'] if i['seat'] == 3), None)
+        self.assertEqual(player['rounds'][0]['is_riichi'], False)
+        self.assertEqual(player['rounds'][1]['is_riichi'], False)
