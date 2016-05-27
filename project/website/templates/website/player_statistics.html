@@ -53,6 +53,28 @@
             </div>
         </div>
 
+        <div class="col-lg-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Average values</h3>
+                </div>
+                <table class="table">
+                    <tr>
+                        <td>Average position</td>
+                        <td>{{ average_position|floatformat:-2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Average win scores</td>
+                        <td>{{ average_win_scores|floatformat:0|intcomma }}</td>
+                    </tr>
+                    <tr>
+                        <td>Average deal scores</td>
+                        <td>{{ average_deal_scores|floatformat:0|intcomma }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
         <div class="col-lg-12">
             <p>Latest 20 games (total {{ total_games|intcomma }})</p>
             <table class="table table-bordered table-striped">
