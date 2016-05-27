@@ -40,6 +40,8 @@ class TenhouLogParser(MahjongConstants):
         elements = soup.find_all()
 
         round_data = {}
+        win_scores = {}
+        lose_scores = {}
         who_open_hand = []
         who_called_riichi = []
         round_number = 0
@@ -70,6 +72,16 @@ class TenhouLogParser(MahjongConstants):
                 winner = int(tag.attrs['who'])
                 from_who = int(tag.attrs['fromwho'])
 
+                ten = tag.attrs['ten'].split(',')
+                ten = [int(i) for i in ten]
+
+                win_scores[winner] = ten[1]
+                # in double ron we need to calculate all dealt hands
+                if from_who in lose_scores:
+                    lose_scores[from_who] += ten[1]
+                else:
+                    lose_scores[from_who] = ten[1]
+
                 if round_data:
                     round_data['winners'].append(winner)
                 else:
@@ -81,6 +93,8 @@ class TenhouLogParser(MahjongConstants):
                         'is_retake': False,
                         'round_number': round_number,
                         'honba': honba,
+                        'win_scores': win_scores,
+                        'lose_scores': lose_scores
                     }
 
             # retake
@@ -110,6 +124,8 @@ class TenhouLogParser(MahjongConstants):
             if round_data and (tag.name == 'init' or 'owari' in tag.attrs):
                 rounds.append(round_data)
                 round_data = {}
+                win_scores = {}
+                lose_scores = {}
                 who_open_hand = []
                 who_called_riichi = []
 
@@ -130,6 +146,8 @@ class TenhouLogParser(MahjongConstants):
                     'is_riichi': False,
                     'round_number': round_data['round_number'],
                     'honba': round_data['honba'],
+                    'win_scores': 0,
+                    'lose_scores': 0,
                 }
 
                 if round_data['is_retake']:
@@ -143,6 +161,8 @@ class TenhouLogParser(MahjongConstants):
                     data['is_tsumo'] = is_winner and round_data['from_who'] in round_data['winners']
                     data['is_open_hand'] = player_seat in round_data['who_open_hand']
                     data['is_riichi'] = player_seat in round_data['who_called_riichi']
+                    data['win_scores'] = player_seat in round_data['win_scores'] and round_data['win_scores'][player_seat] or 0
+                    data['lose_scores'] = player_seat in round_data['lose_scores'] and round_data['lose_scores'][player_seat] or 0
 
                 player_rounds.append(data)
 

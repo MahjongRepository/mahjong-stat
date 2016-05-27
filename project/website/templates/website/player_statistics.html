@@ -5,57 +5,106 @@
     <div class="page-header">
         <h3>{{ player.username }}</h3>
     </div>
-    <div>
-        <p>Average position: {{ average_position|floatformat:2 }}</p>
-        <p>Latest 10 games</p>
-        <table class="table table-bordered table-striped">
-            <tr>
-                <th>Log</th>
-                <th>Type</th>
-                <th>Position</th>
-                <th>Scores</th>
-                <th>Date</th>
-            </tr>
-            {% for game in games %}
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Main stat</h3>
+                </div>
+                <table class="table">
+                    <tr>
+                        <td>Average position</td>
+                        <td>{{ average_position|floatformat:-2 }}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Win rate</td>
+                        <td>{{ win_rate|floatformat:-2 }}%</td>
+                        <td>
+                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
+                                  title="is the number of hands you have won divided by the total number of hands you have played in all games"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Feed rate</td>
+                        <td>{{ feed_rate|floatformat:-2 }}%</td>
+                        <td>
+                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
+                                  title="is the number of times you have fed the winning tile to an opponent’s hand divided by the total number of hands you have played"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Call rate</td>
+                        <td>{{ call_rate|floatformat:-2 }}%</td>
+                        <td>
+                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
+                                  title="is the number of hands where you have called chii / pon / kan divided by the total number of hands you have played"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Riichi rate</td>
+                        <td>{{ riichi_rate|floatformat:-2 }}%</td>
+                        <td>
+                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
+                                  title="is the number of hands where you have called riichi divided by the total number of hands you have played"></span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <p>Latest 20 games (total {{ total_games|intcomma }})</p>
+            <table class="table table-bordered table-striped">
                 <tr>
-                    <td>
-                        <a href="{{ game.get_tenhou_url }}" target="_blank">
-                            {{ game.get_tenhou_url }}
-                        </a>
-                    </td>
-                    <td>{{ game.get_game_rule_display }}</td>
-                    <td>{{ game.player_position }}</td>
-                    <td>{{ game.scores|intcomma }}</td>
-                    <td>{{ game.game_date }}</td>
+                    <th>Log</th>
+                    <th>Type</th>
+                    <th>Position</th>
+                    <th>Scores</th>
+                    <th>Date</th>
                 </tr>
-                <tr>
-                    <td>
-                        {% for round in game.rounds.all %}
-                            {{ round.round_number_display }}
+                {% for game in games %}
+                    <tr>
+                        <td>
+                            <a href="{{ game.get_tenhou_url }}" target="_blank">
+                                {{ game.get_tenhou_url }}
+                            </a>
+                        </td>
+                        <td>{{ game.get_game_rule_display }}</td>
+                        <td>{{ game.player_position }}</td>
+                        <td>{{ game.scores|intcomma }}</td>
+                        <td>{{ game.game_date }}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% for round in game.rounds.all %}
+                                {{ round.round_number_display }}
 
-                            {% if round.is_win %}
-                                Win ({{ round.is_tsumo|yesno:"tsumo,ron" }})
-                            {% endif %}
+                                {% if round.is_win %}
+                                    Win ({{ round.is_tsumo|yesno:"tsumo,ron" }})
+                                    {{ round.win_scores|intcomma }}
+                                {% endif %}
 
-                            {% if round.is_deal %}
-                                Deal to the hand
-                            {% endif %}
+                                {% if round.is_deal %}
+                                    Deal {{ round.lose_scores|intcomma }}
+                                {% endif %}
 
-                            {% if round.is_retake %}
-                                Retake
-                            {% endif %}
+                                {% if round.is_retake %}
+                                    Retake
+                                {% endif %}
 
-                            {% if not round.is_win and not round.is_deal and not round.is_retake %}
-                                -
-                            {% endif %}
+                                {% if not round.is_win and not round.is_deal and not round.is_retake %}
+                                    -
+                                {% endif %}
 
-                            <br>
-                        {% endfor %}
-                    </td>
-                    <td colspan="4"></td>
-                </tr>
-            {% endfor %}
-        </table>
+                                <br>
+                            {% endfor %}
+                        </td>
+                        <td colspan="4"></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
     </div>
 
 {% endblock %}

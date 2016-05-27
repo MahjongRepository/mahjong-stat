@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from api.decorators import token_authentication
 from tenhou_log_parser.main import TenhouLogParser
-from website.games.models import Game
+from website.games.models import Game, GameRound
 
 
 @token_authentication
@@ -24,7 +24,7 @@ def add_tenhou_game(request):
 
     player = players.get(username=player_data['name'])
 
-    Game.objects.create(
+    game = Game.objects.create(
         player=player,
         external_id=log_id,
         player_position=player_data['position'],
@@ -37,5 +37,20 @@ def add_tenhou_game(request):
         lobby=results['lobby'],
         game_log_content=results['log_data']
     )
+
+    for round_data in player_data['rounds']:
+        GameRound.objects.create(
+            game=game,
+            is_win=round_data['is_win'],
+            is_deal=round_data['is_deal'],
+            is_retake=round_data['is_retake'],
+            is_tsumo=round_data['is_tsumo'],
+            is_riichi=round_data['is_riichi'],
+            is_open_hand=round_data['is_open_hand'],
+            round_number=round_data['round_number'],
+            honba=round_data['honba'],
+            win_scores=round_data['win_scores'],
+            lose_scores=round_data['lose_scores'],
+        )
 
     return JsonResponse({'success': True})

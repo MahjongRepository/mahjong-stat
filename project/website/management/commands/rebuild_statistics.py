@@ -29,5 +29,7 @@ class Command(BaseCommand):
                         is_riichi=round_data['is_riichi'],
                         is_open_hand=round_data['is_open_hand'],
                         round_number=round_data['round_number'],
-                        honba=round_data['honba']
+                        honba=round_data['honba'],
+                        win_scores=round_data['win_scores'],
+                        lose_scores=round_data['lose_scores'],
                     )

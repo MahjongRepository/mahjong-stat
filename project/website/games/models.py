@@ -55,6 +55,9 @@ class GameRound(models.Model):
     round_number = models.PositiveSmallIntegerField(default=0)
     honba = models.PositiveSmallIntegerField(default=0)
 
+    win_scores = models.PositiveIntegerField(default=0)
+    lose_scores = models.PositiveIntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
