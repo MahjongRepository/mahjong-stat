@@ -97,6 +97,13 @@
                             {% for round in game.rounds.all %}
                                 {{ round.round_number_display }}
 
+                                {% if round.is_riichi %}
+                                    Riichi,
+                                    {% if not round.is_win %}
+                                        Failed
+                                    {% endif %}
+                                {% endif %}
+
                                 {% if round.is_win %}
                                     Win ({{ round.is_tsumo|yesno:"tsumo,ron" }})
                                     {{ round.win_scores|intcomma }}
@@ -110,7 +117,7 @@
                                     Retake
                                 {% endif %}
 
-                                {% if not round.is_win and not round.is_deal and not round.is_retake %}
+                                {% if not round.is_win and not round.is_deal and not round.is_retake and not round.is_riichi %}
                                     -
                                 {% endif %}
 
