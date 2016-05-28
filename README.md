@@ -1,3 +1,6 @@
-Simple application to collect your mahjong statistics from tenhou.net replays.
+Simple web-application to process and store your mahjong statistics from tenhou.net replays.
 
-For now only your place and scores can be parsed and stored but I have some plans to improve it.
+For now it supported only based stat like played games with position and scores,
+state of round (win, deal, retake):
+
+![2222](https://cloud.githubusercontent.com/assets/475367/15628528/af289028-2535-11e6-9e30-a713ceec0a51.png)
