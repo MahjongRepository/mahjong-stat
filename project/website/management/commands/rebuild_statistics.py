@@ -16,8 +16,17 @@ class Command(BaseCommand):
             for game in games:
                 GameRound.objects.filter(game=game).delete()
 
-                results = TenhouLogParser().parse_log(log_data=game.game_log_content)
+                results = TenhouLogParser().parse_log(game.external_id, game.game_log_content)
                 player_result = next((i for i in results['players'] if i['name'] == player.username), None)
+
+                game.player_position = player_result['position']
+                game.scores = player_result['scores']
+                game.seat = player_result['seat']
+                game.game_rule = results['game_rule']
+                game.game_type = results['game_type']
+                game.game_date = results['game_date']
+                game.lobby = results['lobby']
+                game.save()
 
                 for round_data in player_result['rounds']:
                     GameRound.objects.create(

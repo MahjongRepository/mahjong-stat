@@ -22,6 +22,7 @@ class MahjongConstants(object):
     HANCHAN_FAST_TANYAO_RED_FIVES = 8
 
     GAME_RULES = (
+        (UNKNOWN, 'Unknown'),
         (TONPUSEN_NO_TANYAO_NO_RED_FIVES, 'Tonpusen. No tanyao, no red fives'),
         (TONPUSEN_TANYAO_NO_RED_FIVES, 'Tonpusen. Tanyao, no red fives'),
         (TONPUSEN_TANYAO_RED_FIVES, 'Tonpusen. Tanyao, red fives'),

@@ -24,7 +24,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(len(results['players']), 4)
 
         self.assertEqual(results['players'][0]['seat'], 0)
@@ -55,7 +55,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['game_type'], MahjongConstants.FOUR_PLAYERS)
         self.assertEqual(len(results['players']), 4)
 
@@ -73,7 +73,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['game_type'], MahjongConstants.THREE_PLAYERS)
         self.assertEqual(len(results['players']), 3)
 
@@ -87,7 +87,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         <GO type="9" lobby="0"/>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['lobby'], 0)
 
         data = self._prepare_data("""
@@ -95,7 +95,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         <GO type="9" lobby="1111"/>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['lobby'], 1111)
 
     def test_parse_game_rule(self):
@@ -104,7 +104,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         <GO type="9" lobby="0"/>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['lobby'], 0)
 
         data = self._prepare_data("""
@@ -112,7 +112,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         <GO type="9" lobby="1111"/>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['lobby'], 1111)
 
     def test_parse_game_type(self):
@@ -120,21 +120,21 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         <mjloggm ver="2.3">
         <GO type="9" lobby="0"/>
         """)
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['game_rule'], MahjongConstants.HANCHAN_TANYAO_RED_FIVES)
 
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <GO type="25" lobby="0"/>
         """)
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['game_rule'], MahjongConstants.HANCHAN_TANYAO_RED_FIVES)
 
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <GO type="1" lobby="0"/>
         """)
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['game_rule'], MahjongConstants.TONPUSEN_TANYAO_RED_FIVES)
 
     def test_parse_game_date(self):
@@ -160,7 +160,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         for player in results['players']:
             self.assertEqual(len(player['rounds']), 2)
@@ -209,7 +209,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         player = next((i for i in results['players'] if i['seat'] == 0), None)
         self.assertEqual(player['rounds'][0]['is_win'], True)
@@ -243,7 +243,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         player = next((i for i in results['players'] if i['seat'] == 0), None)
         self.assertEqual(player['rounds'][1]['is_deal'], False)
@@ -274,7 +274,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         for player in results['players']:
             self.assertEqual(len(player['rounds']), 1)
@@ -319,7 +319,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         for player in results['players']:
             self.assertEqual(len(player['rounds']), 2)
@@ -356,7 +356,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         player = next((i for i in results['players'] if i['seat'] == 0), None)
         self.assertEqual(player['rounds'][0]['is_open_hand'], False)
@@ -382,7 +382,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         player = next((i for i in results['players'] if i['seat'] == 0), None)
         self.assertEqual(player['rounds'][0]['is_riichi'], True)
@@ -420,7 +420,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         player = next((i for i in results['players'] if i['seat'] == 0), None)
         self.assertEqual(player['rounds'][0]['is_riichi'], False)
@@ -462,7 +462,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         </mjloggm>
         """)
 
-        results = TenhouLogParser().parse_log(log_data=data)
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
 
         player = next((i for i in results['players'] if i['seat'] == 0), None)
         self.assertEqual(player['rounds'][0]['round_number'], 0)

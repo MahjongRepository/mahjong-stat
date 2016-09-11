@@ -17,23 +17,19 @@ logs_temp_directory = os.path.join(settings.BASE_DIR, 'tests_temp_data')
 
 class TenhouLogParser(MahjongConstants):
 
-    def parse_log(self, log_id=None, log_data=None):
+    def parse_log(self, log_id, log_data=None):
         player_names = []
         scores = []
         lobby = 0
         game_rule = self.UNKNOWN
-        game_date = timezone.now()
         rounds = []
 
-        if log_id:
+        if not log_data:
             log_data = self._get_log_data(log_id)
 
-            game_date = log_id.split('-')[0]
-            # 2016052113gm
-            game_date = datetime.strptime(game_date, '%Y%m%d%Hgm').replace(tzinfo=timezone.utc)
-
-        if not log_data:
-            return []
+        game_date = log_id.split('-')[0]
+        # 2016052113gm
+        game_date = datetime.strptime(game_date, '%Y%m%d%Hgm').replace(tzinfo=timezone.utc)
 
         # tenhou produced not valid XML, so let's use BeautifulSoup for parsing
         soup = BeautifulSoup(log_data, 'html.parser')
@@ -196,11 +192,22 @@ class TenhouLogParser(MahjongConstants):
         lobby = int(tag.attrs['lobby'])
         game_rule_temp = int(tag.attrs['type'])
 
+        # need to think a better way to determine game rules
         game_rule_dictionary = {
             1: self.TONPUSEN_TANYAO_RED_FIVES,
+
             9: self.HANCHAN_TANYAO_RED_FIVES,
+            137: self.HANCHAN_TANYAO_RED_FIVES,
+
+            11: self.HANCHAN_TANYAO_NO_RED_FIVES,
+
             # hirosima
+
             25: self.HANCHAN_TANYAO_RED_FIVES,
+            89: self.HANCHAN_FAST_TANYAO_RED_FIVES,
+
+            17: self.TONPUSEN_TANYAO_RED_FIVES,
+            81: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
         }
 
         game_rule = game_rule_temp in game_rule_dictionary and game_rule_dictionary[game_rule_temp] or self.UNKNOWN
