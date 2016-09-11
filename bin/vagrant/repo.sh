@@ -18,7 +18,8 @@ then
   wget --quiet -O - https://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add -
 fi
 
-# it will add node and will update apt cache
-curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+# Python 3.5 repo
+sudo add-apt-repository -y ppa:fkrull/deadsnakes
 
+sudo apt-get update
 apt-get -y upgrade

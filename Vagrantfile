@@ -18,6 +18,6 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision :shell, path: "bin/vagrant/repo.sh"
-  config.vm.provision :shell, path: "bin/vagrant/postgresql.sh"
+#  config.vm.provision :shell, path: "bin/vagrant/postgresql.sh"
   config.vm.provision :shell, path: "bin/vagrant/app.sh"
 end
