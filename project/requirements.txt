@@ -1,2 +1,2 @@
-Django==1.9.7
-beautifulsoup4==4.4.1
+Django==1.10.1
+beautifulsoup4==4.5.1
