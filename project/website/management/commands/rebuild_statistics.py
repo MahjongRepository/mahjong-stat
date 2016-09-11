@@ -28,6 +28,7 @@ class Command(BaseCommand):
                         is_tsumo=round_data['is_tsumo'],
                         is_riichi=round_data['is_riichi'],
                         is_open_hand=round_data['is_open_hand'],
+                        is_damaten=round_data['is_damaten'],
                         round_number=round_data['round_number'],
                         honba=round_data['honba'],
                         win_scores=round_data['win_scores'],

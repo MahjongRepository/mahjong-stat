@@ -8,7 +8,7 @@ from website.games.models import GameRound
 def player_statistics(request, player_id):
     player = get_object_or_404(Player, id=player_id)
 
-    games = player.games.all()
+    games = player.games.all().order_by('-game_date')
     total_games = games.count()
 
     total_rounds = GameRound.objects.filter(game__player=player).count()
@@ -16,11 +16,13 @@ def player_statistics(request, player_id):
     win_rounds = GameRound.objects.filter(game__player=player, is_win=True).count()
     open_hand_rounds = GameRound.objects.filter(game__player=player, is_open_hand=True).count()
     riichi_rounds = GameRound.objects.filter(game__player=player, is_riichi=True).count()
+    damaten_rounds = GameRound.objects.filter(game__player=player, is_damaten=True).count()
 
     feed_rate = (deal_rounds / total_rounds) * 100
     win_rate = (win_rounds / total_rounds) * 100
     call_rate = (open_hand_rounds / total_rounds) * 100
     riichi_rate = (riichi_rounds / total_rounds) * 100
+    damaten_rate = (damaten_rounds / total_rounds) * 100
 
     average_position = games.aggregate(Avg('player_position'))['player_position__avg']
     average_deal_scores = (GameRound.objects
@@ -41,4 +43,5 @@ def player_statistics(request, player_id):
         'win_rate': win_rate,
         'call_rate': call_rate,
         'riichi_rate': riichi_rate,
+        'damaten_rate': damaten_rate,
     })

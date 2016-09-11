@@ -44,6 +44,14 @@
                                   title="is the number of hands where you have called riichi divided by the total number of hands you have played"></span>
                         </td>
                     </tr>
+                    <tr>
+                        <td>Damaten rate</td>
+                        <td>{{ damaten_rate|floatformat:-2 }}%</td>
+                        <td>
+                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
+                                  title="is the number of hands where you have won without opening a hand and riichi calling divided by the total number of hands you have played"></span>
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
@@ -119,6 +127,10 @@
 
                                 {% if not round.is_win and not round.is_deal and not round.is_retake and not round.is_riichi %}
                                     -
+                                {% endif %}
+
+                                {% if round.is_damaten %}
+                                    <span class="label label-success">damaten</span>
                                 {% endif %}
 
                                 <br>

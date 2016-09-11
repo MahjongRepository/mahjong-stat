@@ -51,6 +51,7 @@ class GameRound(models.Model):
     is_tsumo = models.BooleanField(default=False)
     is_riichi = models.BooleanField(default=False)
     is_open_hand = models.BooleanField(default=False)
+    is_damaten = models.BooleanField(default=False)
 
     round_number = models.PositiveSmallIntegerField(default=0)
     honba = models.PositiveSmallIntegerField(default=0)
