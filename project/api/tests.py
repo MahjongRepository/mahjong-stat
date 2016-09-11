@@ -34,6 +34,19 @@ class ApiTestCase(TestCase):
         self.assertNotEqual(games[0].game_log_content, '')
         self.assertEqual(games[0].rounds.all().count(), 6)
 
+    def test_add_already_added_game(self):
+        token = ApiToken.objects.create(user=self.user)
+        Player.objects.create(user=self.user, username='NoName')
+
+        data = {
+            'id': '2016051813gm-0001-0000-d455c767',
+        }
+        self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
+
+        response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['success'], False)
+
     def test_add_new_tenhou_game_without_id(self):
         token = ApiToken.objects.create(user=self.user)
         data = {

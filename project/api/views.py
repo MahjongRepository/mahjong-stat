@@ -16,6 +16,9 @@ def add_tenhou_game(request):
     if not log_id or not usernames:
         return JsonResponse({'success': False})
 
+    if Game.objects.filter(external_id=log_id, game_place=Game.TENHOU).exists():
+        return JsonResponse({'success': False})
+
     results = TenhouLogParser().parse_log(log_id)
 
     player_data = next((i for i in results['players'] if i['name'] in usernames), None)
