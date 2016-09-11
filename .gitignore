@@ -9,4 +9,6 @@ collected_static
 local_settings.py
 mahjong.db
 
+meta.txt
+
 tests_temp_data
