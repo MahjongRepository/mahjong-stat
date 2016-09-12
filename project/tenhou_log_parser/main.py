@@ -194,6 +194,7 @@ class TenhouLogParser(MahjongConstants):
 
         # need to think a better way to determine game rules
         game_rule_dictionary = {
+            7: self.TONPUSEN_NO_TANYAO_NO_RED_FIVES,
             1: self.TONPUSEN_TANYAO_RED_FIVES,
 
             9: self.HANCHAN_TANYAO_RED_FIVES,
