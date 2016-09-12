@@ -148,14 +148,18 @@
                                 {% endif %}
 
                                 {% if round.is_deal %}
-                                    Deal {{ round.lose_scores|intcomma }}
+                                    Deal (ron) {{ round.lose_scores|intcomma }}
+                                {% endif %}
+
+                                {% if not round.is_deal and round.lose_scores %}
+                                    Deal (tsumo) {{ round.lose_scores|intcomma }}
                                 {% endif %}
 
                                 {% if round.is_retake %}
                                     Retake
                                 {% endif %}
 
-                                {% if not round.is_win and not round.is_deal and not round.is_retake and not round.is_riichi %}
+                                {% if not round.is_win and not round.is_deal and not round.is_retake and not round.is_riichi and not round.lose_scores %}
                                     -
                                 {% endif %}
 

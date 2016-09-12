@@ -55,10 +55,6 @@ class TenhouLogParser(MahjongConstants):
             if tag.name == 'un' and 'rate' in tag.attrs:
                 player_names = self.parse_names(tag)
 
-            # the final result
-            if 'owari' in tag.attrs:
-                scores, _ = self.parse_final_scores(tag)
-
             # start of the game
             if tag.name == 'go':
                 lobby, game_rule = self.parse_game_lobby_and_rule(tag)
@@ -73,10 +69,30 @@ class TenhouLogParser(MahjongConstants):
 
                 win_scores[winner] = ten[1]
                 # in double ron we need to calculate all dealt hands
-                if from_who in lose_scores:
-                    lose_scores[from_who] += ten[1]
-                else:
-                    lose_scores[from_who] = ten[1]
+                if from_who != winner:
+                    if from_who in lose_scores:
+                        lose_scores[from_who] += ten[1]
+                    else:
+                        lose_scores[from_who] = ten[1]
+
+                # format: sc="157,20,245,-39,376,-79,222,-39"
+                if 'sc' in tag.attrs:
+                    scores = tag.attrs['sc'].split(',')
+                    scores = [int(i) for i in scores]
+
+                    seat = 0
+                    for i in range(1, 8, 2):
+                        score = scores[i] * 100
+                        if score > 0:
+                            win_scores[seat] = score
+                        else:
+                            lose_scores[seat] = score * -1
+
+                        seat += 1
+
+                # the final result
+                if 'owari' in tag.attrs:
+                    scores, _ = self.parse_final_scores(tag)
 
                 if round_data:
                     round_data['winners'].append(winner)

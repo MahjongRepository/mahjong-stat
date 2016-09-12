@@ -204,7 +204,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
 
         <INIT seed="1,0"/>
         <T76/><D123/><U125/>
-        <AGARI who="0" fromWho="0" owari="1,2,3,4,5,6,7,8" ten="30,2000,0"/>
+        <AGARI who="0" fromWho="0" owari="1,2,3,4,5,6,7,8" ten="30,2000,0" sc="157,20,245,-5,376,-10,222,-5"/>
 
         </mjloggm>
         """)
@@ -220,12 +220,15 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
 
         player = next((i for i in results['players'] if i['seat'] == 1), None)
         self.assertEqual(player['rounds'][0]['is_deal'], False)
+        self.assertEqual(player['rounds'][0]['lose_scores'], 500)
 
         player = next((i for i in results['players'] if i['seat'] == 2), None)
         self.assertEqual(player['rounds'][0]['is_deal'], False)
+        self.assertEqual(player['rounds'][0]['lose_scores'], 1000)
 
         player = next((i for i in results['players'] if i['seat'] == 3), None)
         self.assertEqual(player['rounds'][0]['is_deal'], False)
+        self.assertEqual(player['rounds'][0]['lose_scores'], 500)
 
     def test_rounds_and_retake(self):
         data = self._prepare_data("""
