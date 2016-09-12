@@ -25,6 +25,12 @@ def player_statistics(request, player_id):
     riichi_rate = (riichi_rounds / total_rounds) * 100
     damaten_rate = (damaten_rounds / total_rounds) * 100
 
+    riichi_successful = rounds.filter(is_riichi=True, is_win=True).count()
+    riichi_failed = riichi_rounds - riichi_successful
+
+    riichi_successful = (riichi_successful / riichi_rounds) * 100
+    riichi_failed = (riichi_failed / riichi_rounds) * 100
+
     average_position = games.aggregate(Avg('player_position'))['player_position__avg']
     average_deal_scores = (rounds
                            .filter(is_deal=True)
@@ -59,6 +65,9 @@ def player_statistics(request, player_id):
         'call_rate': call_rate,
         'riichi_rate': riichi_rate,
         'damaten_rate': damaten_rate,
+
+        'riichi_successful': riichi_successful,
+        'riichi_failed': riichi_failed,
 
         'first_position_rate': first_position_rate,
         'second_position_rate': second_position_rate,

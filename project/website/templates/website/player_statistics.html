@@ -44,6 +44,16 @@
                                   title="is the number of hands where you have called riichi divided by the total number of hands you have played"></span>
                         </td>
                     </tr>
+                    <tr class="small-text">
+                        <td>Successful riichi</td>
+                        <td>{{ riichi_successful|floatformat:-2 }}%</td>
+                        <td></td>
+                    </tr>
+                    <tr class="small-text">
+                        <td>Failed riichi</td>
+                        <td>{{ riichi_failed|floatformat:-2 }}%</td>
+                        <td></td>
+                    </tr>
                     <tr>
                         <td>Damaten rate</td>
                         <td>{{ damaten_rate|floatformat:-2 }}%</td>
