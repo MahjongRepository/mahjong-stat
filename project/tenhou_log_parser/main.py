@@ -270,8 +270,9 @@ class TenhouLogParser(MahjongConstants):
             log_id = self._get_log_name_for_download(log_id)
             log_data = self._download_log(log_id)
 
-            with open(log_file, 'wb') as f:
-                f.write(log_data)
+            if settings.IS_TEST_RUN:
+                with open(log_file, 'wb') as f:
+                    f.write(log_data)
 
         return log_data
 
