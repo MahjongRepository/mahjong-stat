@@ -19,6 +19,7 @@ class TenhouLogParser(MahjongConstants):
 
     def parse_log(self, log_id, log_data=None):
         player_names = []
+        player_rates = []
         scores = []
         lobby = 0
         game_rule = self.UNKNOWN
@@ -54,6 +55,7 @@ class TenhouLogParser(MahjongConstants):
 
             if tag.name == 'un' and 'rate' in tag.attrs:
                 player_names = self.parse_names(tag)
+                player_rates = self.parse_rates(tag)
 
             # start of the game
             if tag.name == 'go':
@@ -81,13 +83,13 @@ class TenhouLogParser(MahjongConstants):
                     scores = [int(i) for i in scores]
 
                     seat = 0
-                    for i in range(1, 8, 2):
-                        score = scores[i] * 100
+                    scores = scores[1::2]
+                    for score in scores:
+                        score *= 100
                         if score > 0:
                             win_scores[seat] = score
                         else:
                             lose_scores[seat] = score * -1
-
                         seat += 1
 
                 # the final result
@@ -146,8 +148,8 @@ class TenhouLogParser(MahjongConstants):
 
         players = []
         for player_seat in range(0, len(player_names)):
-
             player_rounds = []
+
             for round_data in rounds:
                 data = {
                     'is_win': False,
@@ -182,6 +184,7 @@ class TenhouLogParser(MahjongConstants):
 
             players.append({
                 'name': player_names[player_seat],
+                'rate': player_rates[player_seat],
                 'scores': int(scores[player_seat] * 100),
                 'seat': player_seat,
                 'rounds': player_rounds
@@ -243,6 +246,11 @@ class TenhouLogParser(MahjongConstants):
         if not result[-1]:
             del result[-1]
 
+        return result
+
+    def parse_rates(self, tag):
+        result = tag.attrs['rate'].split(',')
+        result = [float(i) for i in result]
         return result
 
     def parse_final_scores(self, tag):

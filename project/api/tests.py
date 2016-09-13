@@ -29,10 +29,12 @@ class ApiTestCase(TestCase):
 
         games = Game.objects.filter(player=player)
         self.assertEqual(games.count(), 1)
-        self.assertEqual(games[0].external_id, data['id'])
-        self.assertEqual(games[0].player_position, 2)
-        self.assertNotEqual(games[0].game_log_content, '')
-        self.assertEqual(games[0].rounds.all().count(), 6)
+        game = games[0]
+        self.assertEqual(game.external_id, data['id'])
+        self.assertEqual(game.player_position, 2)
+        self.assertEqual(game.rate, 1500.00)
+        self.assertNotEqual(game.game_log_content, '')
+        self.assertEqual(game.rounds.all().count(), 6)
 
     def test_add_already_added_game(self):
         token = ApiToken.objects.create(user=self.user)
