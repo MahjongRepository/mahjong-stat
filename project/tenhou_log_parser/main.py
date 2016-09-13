@@ -20,6 +20,7 @@ class TenhouLogParser(MahjongConstants):
     def parse_log(self, log_id, log_data=None):
         player_names = []
         player_rates = []
+        player_ranks = []
         scores = []
         lobby = 0
         game_rule = self.UNKNOWN
@@ -56,6 +57,7 @@ class TenhouLogParser(MahjongConstants):
             if tag.name == 'un' and 'rate' in tag.attrs:
                 player_names = self.parse_names(tag)
                 player_rates = self.parse_rates(tag)
+                player_ranks = self.parse_ranks(tag)
 
             # start of the game
             if tag.name == 'go':
@@ -185,6 +187,7 @@ class TenhouLogParser(MahjongConstants):
             players.append({
                 'name': player_names[player_seat],
                 'rate': player_rates[player_seat],
+                'rank': player_ranks[player_seat],
                 'scores': int(scores[player_seat] * 100),
                 'seat': player_seat,
                 'rounds': player_rounds
@@ -250,6 +253,11 @@ class TenhouLogParser(MahjongConstants):
 
     def parse_rates(self, tag):
         result = tag.attrs['rate'].split(',')
+        result = [float(i) for i in result]
+        return result
+
+    def parse_ranks(self, tag):
+        result = tag.attrs['dan'].split(',')
         result = [float(i) for i in result]
         return result
 

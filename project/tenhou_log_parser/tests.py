@@ -69,6 +69,11 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         self.assertEqual(results['players'][2]['rate'], 1238.80)
         self.assertEqual(results['players'][3]['rate'], 1520.41)
 
+        self.assertEqual(results['players'][0]['rank'], 2)
+        self.assertEqual(results['players'][1]['rank'], 3)
+        self.assertEqual(results['players'][2]['rank'], 10)
+        self.assertEqual(results['players'][3]['rank'], 1)
+
     def test_parse_hirosima_players(self):
         data = self._prepare_data("""
         <mjloggm ver="2.3">

@@ -22,6 +22,8 @@ class Command(BaseCommand):
                 game.player_position = player_result['position']
                 game.scores = player_result['scores']
                 game.seat = player_result['seat']
+                game.rate = player_result['rate']
+                game.rank = player_result['rank']
                 game.game_rule = results['game_rule']
                 game.game_type = results['game_type']
                 game.game_date = results['game_date']

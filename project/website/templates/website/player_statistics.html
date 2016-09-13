@@ -4,6 +4,7 @@
 {% block content %}
     <div class="page-header">
         <h3>{{ player.username }}</h3>
+        <span>{{ games.0.get_rank_display }} {{ games.0.rate|floatformat:0 }}</span>
     </div>
     <div class="row">
         <div class="col-lg-3">

@@ -33,6 +33,7 @@ class ApiTestCase(TestCase):
         self.assertEqual(game.external_id, data['id'])
         self.assertEqual(game.player_position, 2)
         self.assertEqual(game.rate, 1500.00)
+        self.assertEqual(game.rank, Game.NEWBIE)
         self.assertNotEqual(game.game_log_content, '')
         self.assertEqual(game.rounds.all().count(), 6)
 

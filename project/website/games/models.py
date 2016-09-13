@@ -29,6 +29,7 @@ class Game(models.Model, MahjongConstants):
     scores = models.SmallIntegerField(default=0)
     seat = models.PositiveSmallIntegerField(default=0)
     rate = models.DecimalField(decimal_places=2, max_digits=6, default=0)
+    rank = models.PositiveIntegerField(choices=MahjongConstants.RANKS, default=MahjongConstants.NEWBIE)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
