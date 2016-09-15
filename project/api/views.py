@@ -34,6 +34,7 @@ def add_tenhou_game(request):
         scores=player_data['scores'],
         seat=player_data['seat'],
         rate=player_data['rate'],
+        rank=player_data['rank'],
         game_place=Game.TENHOU,
         game_rule=results['game_rule'],
         game_type=results['game_type'],

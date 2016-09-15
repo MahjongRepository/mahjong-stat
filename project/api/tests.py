@@ -18,7 +18,7 @@ class ApiTestCase(TestCase):
 
     def test_add_new_game_record(self):
         token = ApiToken.objects.create(user=self.user)
-        player = Player.objects.create(user=self.user, username='NoName')
+        player = Player.objects.create(user=self.user, username=u'ばーや')
 
         data = {
             'id': '2016051813gm-0001-0000-d455c767',
@@ -31,9 +31,9 @@ class ApiTestCase(TestCase):
         self.assertEqual(games.count(), 1)
         game = games[0]
         self.assertEqual(game.external_id, data['id'])
-        self.assertEqual(game.player_position, 2)
-        self.assertEqual(game.rate, 1500.00)
-        self.assertEqual(game.rank, Game.NEWBIE)
+        self.assertEqual(game.player_position, 3)
+        self.assertEqual(float(game.rate), 1440.14)
+        self.assertEqual(game.rank, Game.SECOND_DAN)
         self.assertNotEqual(game.game_log_content, '')
         self.assertEqual(game.rounds.all().count(), 6)
 
