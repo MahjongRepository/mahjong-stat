@@ -8,7 +8,7 @@ from website.games.models import GameRound
 def player_statistics(request, player_id):
     player = get_object_or_404(Player, id=player_id)
 
-    games = player.games.all().order_by('-game_date')
+    games = player.games.all().order_by('-game_date').order_by('-id')
     total_games = games.count()
 
     rounds = GameRound.objects.filter(game__player=player)
