@@ -4,119 +4,122 @@
 {% block content %}
     <div class="page-header">
         <h3>{{ player.username }}</h3>
-        <span>{{ games.0.get_rank_display }} {{ games.0.rate|floatformat:0 }}</span>
+        <span>{{ games.0.get_rank_display }} R{{ games.0.rate|floatformat:0 }}</span>
     </div>
     <div class="row">
         <div class="col-lg-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Main stat</h3>
-                </div>
-                <table class="table">
-                    <tr>
-                        <td>Win rate</td>
-                        <td>{{ win_rate|floatformat:-2 }}%</td>
-                        <td>
-                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
-                                  title="is the number of hands you have won divided by the total number of hands you have played in all games"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Feed rate</td>
-                        <td>{{ feed_rate|floatformat:-2 }}%</td>
-                        <td>
-                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
-                                  title="is the number of times you have fed the winning tile to an opponent’s hand divided by the total number of hands you have played"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Call rate</td>
-                        <td>{{ call_rate|floatformat:-2 }}%</td>
-                        <td>
-                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
-                                  title="is the number of hands where you have called chii / pon / kan divided by the total number of hands you have played"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Riichi rate</td>
-                        <td>{{ riichi_rate|floatformat:-2 }}%</td>
-                        <td>
-                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
-                                  title="is the number of hands where you have called riichi divided by the total number of hands you have played"></span>
-                        </td>
-                    </tr>
-                    <tr class="small-text">
-                        <td>Successful riichi</td>
-                        <td>{{ riichi_successful|floatformat:-2 }}%</td>
-                        <td></td>
-                    </tr>
-                    <tr class="small-text">
-                        <td>Failed riichi</td>
-                        <td>{{ riichi_failed|floatformat:-2 }}%</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>Damaten rate</td>
-                        <td>{{ damaten_rate|floatformat:-2 }}%</td>
-                        <td>
-                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"
-                                  title="is the number of hands where you have won without opening a hand and riichi calling divided by the total number of hands you have played"></span>
-                        </td>
-                    </tr>
-                </table>
-            </div>
+            <table class="table table-bordered">
+                <tr class="success">
+                    <td>Win Rate</td>
+                    <td>{{ win_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Win with riichi</td>
+                    <td>{{ win_with_riichi|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Win with open hand</td>
+                    <td>{{ win_with_open_hand|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Win with damaten</td>
+                    <td>{{ win_with_damaten|floatformat:-2 }}%</td>
+                </tr>
+                <tr class="success">
+                    <td>Riichi rate</td>
+                    <td>{{ riichi_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Successful riichi</td>
+                    <td>{{ riichi_successful|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Failed riichi</td>
+                    <td>{{ riichi_failed|floatformat:-2 }}%</td>
+                </tr>
+                <tr class="success">
+                    <td>Feed rate</td>
+                    <td>{{ feed_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Feed when in riichi</td>
+                    <td>{{ feed_when_riichi|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Other</td>
+                    <td>{{ other_feed|floatformat:-2 }}%</td>
+                </tr>
+                <tr class="success">
+                    <td>Call rate</td>
+                    <td>{{ call_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Win after call</td>
+                    <td>{{ call_and_win|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Feed after call</td>
+                    <td>{{ call_and_deal|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Other</td>
+                    <td>{{ call_and_other|floatformat:-2 }}%</td>
+                </tr>
+                <tr class="success">
+                    <td>Damaten rate</td>
+                    <td>{{ damaten_rate|floatformat:-2 }}%</td>
+                </tr>
+            </table>
         </div>
 
         <div class="col-lg-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Average values</h3>
-                </div>
-                <table class="table">
-                    <tr>
-                        <td>Average position</td>
-                        <td>{{ average_position|floatformat:-2 }}</td>
-                    </tr>
-                    <tr>
-                        <td>Average win scores</td>
-                        <td>{{ average_win_scores|floatformat:0|intcomma }}</td>
-                    </tr>
-                    <tr>
-                        <td>Average deal scores</td>
-                        <td>{{ average_deal_scores|floatformat:0|intcomma }}</td>
-                    </tr>
-                </table>
-            </div>
+            <table class="table table-bordered">
+                <tr class="success">
+                    <td>Averages</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Average position</td>
+                    <td>{{ average_position|floatformat:-2 }}</td>
+                </tr>
+                <tr>
+                    <td>Average win scores</td>
+                    <td>{{ average_win_scores|floatformat:0|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td>Average deal scores</td>
+                    <td>{{ average_deal_scores|floatformat:0|intcomma }}</td>
+                </tr>
+            </table>
         </div>
 
         <div class="col-lg-3">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Positions</h3>
-                </div>
-                <table class="table">
-                    <tr>
-                        <td>First place</td>
-                        <td>{{ first_position_rate|floatformat:-2 }}%</td>
-                    </tr>
-                    <tr>
-                        <td>Second place</td>
-                        <td>{{ second_position_rate|floatformat:-2 }}%</td>
-                    </tr>
-                    <tr>
-                        <td>Third place</td>
-                        <td>{{ third_position_rate|floatformat:-2 }}%</td>
-                    </tr>
-                    <tr>
-                        <td>Fourth place</td>
-                        <td>{{ fourth_position_rate|floatformat:-2 }}%</td>
-                    </tr>
-                    <tr>
-                        <td>Bankruptcy</td>
-                        <td>{{ bankruptcy_rate|floatformat:-2 }}%</td>
-                    </tr>
-                </table>
-            </div>
+            <table class="table table-bordered">
+                <tr class="success">
+                    <td>Positions</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>First place</td>
+                    <td>{{ first_position_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Second place</td>
+                    <td>{{ second_position_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Third place</td>
+                    <td>{{ third_position_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Fourth place</td>
+                    <td>{{ fourth_position_rate|floatformat:-2 }}%</td>
+                </tr>
+                <tr>
+                    <td>Bankruptcy</td>
+                    <td>{{ bankruptcy_rate|floatformat:-2 }}%</td>
+                </tr>
+            </table>
         </div>
 
         <div class="col-lg-12">

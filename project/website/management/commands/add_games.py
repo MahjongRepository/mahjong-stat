@@ -5,6 +5,8 @@ import requests
 
 from django.core.management import BaseCommand
 
+from website.games.models import Game
+
 
 class Command(BaseCommand):
 
@@ -22,13 +24,8 @@ class Command(BaseCommand):
             with open(meta_file, 'r', encoding='utf-8') as f:
                 records_to_add = f.read().split('\n')
 
-        i = 0
-        count = len(records_to_add)
         for item in records_to_add:
             game_id = item.split('&')[0].split('=')[1]
 
-            requests.post(url, {'id': game_id}, headers={'Token': token})
-
-            i += 1
-            sleep(1)
-            print('{0}/{1}'.format(i, count))
+            if not Game.objects.filter(external_id=game_id).exists():
+                requests.post(url, {'id': game_id}, headers={'Token': token})

@@ -27,9 +27,25 @@ def player_statistics(request, player_id):
 
     riichi_successful = rounds.filter(is_riichi=True, is_win=True).count()
     riichi_failed = riichi_rounds - riichi_successful
-
     riichi_successful = (riichi_successful / riichi_rounds) * 100
     riichi_failed = (riichi_failed / riichi_rounds) * 100
+
+    win_with_riichi = rounds.filter(is_riichi=True, is_win=True).count()
+    win_with_open_hand = rounds.filter(is_open_hand=True, is_win=True).count()
+    win_with_damaten = rounds.filter(is_damaten=True, is_win=True).count()
+    win_with_riichi = (win_with_riichi / win_rounds) * 100
+    win_with_open_hand = (win_with_open_hand / win_rounds) * 100
+    win_with_damaten = (win_with_damaten / win_rounds) * 100
+
+    feed_when_riichi = rounds.filter(is_riichi=True, is_deal=True).count()
+    other_feed = ((deal_rounds - feed_when_riichi) / deal_rounds) * 100
+    feed_when_riichi = (feed_when_riichi / deal_rounds) * 100
+
+    call_and_win = rounds.filter(is_open_hand=True, is_win=True).count()
+    call_and_deal = rounds.filter(is_open_hand=True, is_deal=True).count()
+    call_and_win = (call_and_win / open_hand_rounds) * 100
+    call_and_deal = (call_and_deal / open_hand_rounds) * 100
+    call_and_other = 100 - call_and_deal - call_and_win
 
     average_position = games.aggregate(Avg('player_position'))['player_position__avg']
     average_deal_scores = (rounds
@@ -74,4 +90,15 @@ def player_statistics(request, player_id):
         'third_position_rate': third_position_rate,
         'fourth_position_rate': fourth_position_rate,
         'bankruptcy_rate': bankruptcy_rate,
+
+        'win_with_riichi': win_with_riichi,
+        'win_with_open_hand': win_with_open_hand,
+        'win_with_damaten': win_with_damaten,
+
+        'feed_when_riichi': feed_when_riichi,
+        'other_feed': other_feed,
+
+        'call_and_win': call_and_win,
+        'call_and_deal': call_and_deal,
+        'call_and_other': call_and_other,
     })
