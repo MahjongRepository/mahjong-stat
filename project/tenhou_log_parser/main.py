@@ -216,21 +216,25 @@ class TenhouLogParser(MahjongConstants):
 
         # need to think a better way to determine game rules
         game_rule_dictionary = {
+            # 0000 lobby
             7: self.TONPUSEN_NO_TANYAO_NO_RED_FIVES,
+            3: self.TONPUSEN_TANYAO_NO_RED_FIVES,
             1: self.TONPUSEN_TANYAO_RED_FIVES,
-
+            65: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
             9: self.HANCHAN_TANYAO_RED_FIVES,
-            137: self.HANCHAN_TANYAO_RED_FIVES,
-
             11: self.HANCHAN_TANYAO_NO_RED_FIVES,
 
-            # hirosima
+            # dan lobby
+            193: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
+            137: self.HANCHAN_TANYAO_RED_FIVES,
+            201: self.HANCHAN_FAST_TANYAO_RED_FIVES,
+
+            # hirosima, 0 lobby
+            17: self.TONPUSEN_TANYAO_RED_FIVES,
+            81: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
 
             25: self.HANCHAN_TANYAO_RED_FIVES,
             89: self.HANCHAN_FAST_TANYAO_RED_FIVES,
-
-            17: self.TONPUSEN_TANYAO_RED_FIVES,
-            81: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
         }
 
         game_rule = game_rule_temp in game_rule_dictionary and game_rule_dictionary[game_rule_temp] or self.UNKNOWN
