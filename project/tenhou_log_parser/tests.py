@@ -47,6 +47,38 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         self.assertEqual(results['players'][3]['position'], 4)
         self.assertEqual(results['players'][3]['scores'], 10400)
 
+    def test_parse_final_scores_and_end_of_the_round_with_retake(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <GO type="9" lobby="0"/>
+        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="%4E%6F%4E%61%6D%65%34" dan="2,3,10,1" rate="1564.57,1470.35,1238.80,1520.41" sx="M,M,M,M"/>
+        <RYUUKYOKU ba="0,2" sc="214,-15,236,15,191,15,339,-15" hai1="13,19,22,50,52,54,57,62,97,100,104,128,131" hai2="5,7,9,11,12,15,45,46,58,59,93,94,102" owari="382,49.0,362,16.0,104,-40.0,152,-25.0" />
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
+        self.assertEqual(len(results['players']), 4)
+
+        self.assertEqual(results['players'][0]['seat'], 0)
+        self.assertEqual(results['players'][0]['name'], 'NoName1')
+        self.assertEqual(results['players'][0]['position'], 1)
+        self.assertEqual(results['players'][0]['scores'], 38200)
+
+        self.assertEqual(results['players'][1]['seat'], 1)
+        self.assertEqual(results['players'][1]['name'], 'NoName2')
+        self.assertEqual(results['players'][1]['position'], 2)
+        self.assertEqual(results['players'][1]['scores'], 36200)
+
+        self.assertEqual(results['players'][2]['seat'], 3)
+        self.assertEqual(results['players'][2]['name'], 'NoName4')
+        self.assertEqual(results['players'][2]['position'], 3)
+        self.assertEqual(results['players'][2]['scores'], 15200)
+
+        self.assertEqual(results['players'][3]['seat'], 2)
+        self.assertEqual(results['players'][3]['name'], 'NoName3')
+        self.assertEqual(results['players'][3]['position'], 4)
+        self.assertEqual(results['players'][3]['scores'], 10400)
+
     def test_parse_players(self):
         data = self._prepare_data("""
         <mjloggm ver="2.3">

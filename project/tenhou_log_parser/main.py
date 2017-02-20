@@ -46,7 +46,6 @@ class TenhouLogParser(MahjongConstants):
         honba = 0
 
         for tag in elements:
-
             if tag.name == 'init':
                 seed = tag.attrs['seed'].split(',')
                 seed = [int(i) for i in seed]
@@ -94,10 +93,6 @@ class TenhouLogParser(MahjongConstants):
                             lose_scores[seat] = score * -1
                         seat += 1
 
-                # the final result
-                if 'owari' in tag.attrs:
-                    scores, _ = self.parse_final_scores(tag)
-
                 if round_data:
                     round_data['winners'].append(winner)
                 else:
@@ -144,6 +139,10 @@ class TenhouLogParser(MahjongConstants):
                 lose_scores = {}
                 who_open_hand = []
                 who_called_riichi = []
+
+            # the final results
+            if 'owari' in tag.attrs:
+                scores, _ = self.parse_final_scores(tag)
 
         if not scores:
             scores = [0] * len(player_names)
