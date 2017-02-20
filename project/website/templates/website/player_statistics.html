@@ -157,16 +157,15 @@
                                 {% endif %}
 
                                 {% if round.is_win %}
-                                    Win ({{ round.is_tsumo|yesno:"tsumo,ron" }})
-                                    {{ round.win_scores|intcomma }}
+                                    <b>Win ({{ round.is_tsumo|yesno:"tsumo,ron" }}) {{ round.win_scores|intcomma }}</b><b></b>
                                 {% endif %}
 
                                 {% if round.is_deal %}
-                                    Deal (ron) {{ round.lose_scores|intcomma }}
+                                    Deal to hand {{ round.lose_scores|intcomma }}
                                 {% endif %}
 
                                 {% if not round.is_deal and round.lose_scores %}
-                                    Deal (tsumo) {{ round.lose_scores|intcomma }}
+                                    Pay for tsumo {{ round.lose_scores|intcomma }}
                                 {% endif %}
 
                                 {% if round.is_retake %}
