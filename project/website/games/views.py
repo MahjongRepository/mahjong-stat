@@ -5,8 +5,8 @@ from website.accounts.models import Player
 from website.games.models import GameRound
 
 
-def player_statistics(request, player_id):
-    player = get_object_or_404(Player, id=player_id)
+def player_statistics(request, player_name):
+    player = get_object_or_404(Player, username=player_name)
 
     games = player.games.all().order_by('-game_date', '-id')
     total_games = games.count()
@@ -23,7 +23,6 @@ def player_statistics(request, player_id):
     win_rate = (win_rounds / total_rounds) * 100
     call_rate = (open_hand_rounds / total_rounds) * 100
     riichi_rate = (riichi_rounds / total_rounds) * 100
-    damaten_rate = (damaten_rounds / total_rounds) * 100
 
     riichi_successful = rounds.filter(is_riichi=True, is_win=True).count()
     riichi_failed = riichi_rounds - riichi_successful
@@ -80,7 +79,6 @@ def player_statistics(request, player_id):
         'win_rate': win_rate,
         'call_rate': call_rate,
         'riichi_rate': riichi_rate,
-        'damaten_rate': damaten_rate,
 
         'riichi_successful': riichi_successful,
         'riichi_failed': riichi_failed,

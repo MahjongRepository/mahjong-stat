@@ -213,30 +213,50 @@ class TenhouLogParser(MahjongConstants):
         lobby = int(tag.attrs['lobby'])
         game_rule_temp = int(tag.attrs['type'])
 
-        # need to think a better way to determine game rules
-        game_rule_dictionary = {
-            # 0000 lobby
-            7: self.TONPUSEN_NO_TANYAO_NO_RED_FIVES,
-            3: self.TONPUSEN_TANYAO_NO_RED_FIVES,
-            1: self.TONPUSEN_TANYAO_RED_FIVES,
-            65: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
-            9: self.HANCHAN_TANYAO_RED_FIVES,
-            11: self.HANCHAN_TANYAO_NO_RED_FIVES,
+        """
+          0 - 1 - online, 0 - bots
+          1 - aka
+          2 - kuitan forbiden
+          3 - hanchan
+          4 - 3man
+          5 - dan flag
+          6 - fast game
+          7 - dan flag
+          Combine them as:
+          76543210
+          00001001 = 9 = hanchan ari-ari
+          00000001 = 1 = tonpu-sen ari-ari
+        """
+        rule = bin(game_rule_temp).replace('0b', '')
+        while len(rule) != 8:
+            rule = '0' + rule
 
-            # dan lobby
-            193: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
-            137: self.HANCHAN_TANYAO_RED_FIVES,
-            201: self.HANCHAN_FAST_TANYAO_RED_FIVES,
+        is_hanchan = rule[4] == '1'
+        is_aka = rule[7] == '1'
+        is_open_tanyao = rule[6] == '0'
+        is_fast = rule[1] == '1'
 
-            # hirosima, 0 lobby
-            17: self.TONPUSEN_TANYAO_RED_FIVES,
-            81: self.TONPUSEN_FAST_TANYAO_RED_FIVES,
-
-            25: self.HANCHAN_TANYAO_RED_FIVES,
-            89: self.HANCHAN_FAST_TANYAO_RED_FIVES,
-        }
-
-        game_rule = game_rule_temp in game_rule_dictionary and game_rule_dictionary[game_rule_temp] or self.UNKNOWN
+        game_rule = self.UNKNOWN
+        if is_hanchan:
+            if is_fast:
+                game_rule = self.HANCHAN_FAST_TANYAO_RED_FIVES
+            else:
+                if is_aka and is_open_tanyao:
+                    game_rule = self.HANCHAN_TANYAO_RED_FIVES
+                if not is_open_tanyao and not is_aka:
+                    game_rule = self.HANCHAN_NO_TANYAO_NO_RED_FIVES
+                if is_open_tanyao and not is_aka:
+                    game_rule = self.HANCHAN_TANYAO_NO_RED_FIVES
+        else:
+            if is_fast:
+                game_rule = self.TONPUSEN_FAST_TANYAO_RED_FIVES
+            else:
+                if is_aka and is_open_tanyao:
+                    game_rule = self.TONPUSEN_TANYAO_RED_FIVES
+                if not is_open_tanyao and not is_aka:
+                    game_rule = self.TONPUSEN_NO_TANYAO_NO_RED_FIVES
+                if is_open_tanyao and not is_aka:
+                    game_rule = self.TONPUSEN_TANYAO_NO_RED_FIVES
 
         return lobby, game_rule
 

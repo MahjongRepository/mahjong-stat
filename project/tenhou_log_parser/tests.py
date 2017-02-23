@@ -140,7 +140,7 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
         self.assertEqual(results['lobby'], 1111)
 
-    def test_parse_game_rule(self):
+    def test_parse_game_lobby(self):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
         <GO type="9" lobby="0"/>
