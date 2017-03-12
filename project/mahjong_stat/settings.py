@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'website',
     'website.accounts',
     'website.games',
+    'website.events',
 ]
 
 MIDDLEWARE_CLASSES = [

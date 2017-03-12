@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="page-header">
+        <h3>{{ event.name }}</h3>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h3>Players</h3>
+            <table class="table table-bordered table-striped table-hover">
+                <tr>
+                    <th>Player</th>
+                    <th>Average place</th>
+                    <th>Rate</th>
+                </tr>
+                {% for player in players %}
+                    <tr>
+                        <td><a href="{% url 'player_statistics' player.player.username %}">{{ player.player.username }}</a></td>
+                        <td>{{ player.average_place }}</td>
+                        <td><span class="label label-{% if player.rate > 0 %}success{% else %}danger{% endif %}">{{ player.rate }}</span></td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            <h3>Latest games</h3>
+            <table class="table table-bordered table-striped table-hover">
+                <tr>
+                    <th>Game link</th>
+                    <th>Date</th>
+                    <th>Results</th>
+                </tr>
+                {% for game in games %}
+                    <tr>
+                        <td><a href="{{ game.tenhou_link }}" target="_blank">{{ game.tenhou_link }}</a></td>
+                        <td>{{ game.game_date }}</td>
+                        <td>
+                            {% for item in game.parsed_result %}
+                                <span>
+                                    {{ item.player }}
+                                    <span class="label label-{% if item.rate > 0 %}success{% else %}danger{% endif %}">{{ item.rate }}</span>
+                                </span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+{% endblock %}
