@@ -17,7 +17,7 @@ sudo apt-get -y install python3.5 python3.5-dev
 virtualenv --python=/usr/bin/python3.5 /home/vagrant/env/
 sudo chmod -R 777 /home/vagrant/env/
 /home/vagrant/env/bin/pip install --upgrade pip
-/home/vagrant/env/bin/pip install -r /vagrant/project/requirements.txt
+/home/vagrant/env/bin/pip install -r /vagrant/project/requirements.pip
 sudo chmod -R 777 /home/vagrant/env/
 
 SECRET_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
