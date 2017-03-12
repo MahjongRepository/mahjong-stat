@@ -26,7 +26,7 @@ class Game(models.Model, MahjongConstants):
 
     external_id = models.CharField(max_length=255, default='', null=True, blank=True)
     player_position = models.PositiveSmallIntegerField(default=0)
-    scores = models.SmallIntegerField(default=0)
+    scores = models.IntegerField(default=0)
     seat = models.PositiveSmallIntegerField(default=0)
     rate = models.DecimalField(decimal_places=2, max_digits=6, default=0)
     rank = models.PositiveIntegerField(choices=MahjongConstants.RANKS, default=MahjongConstants.NEWBIE)
