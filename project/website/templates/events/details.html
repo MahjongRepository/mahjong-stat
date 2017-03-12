@@ -17,7 +17,7 @@
                     <tr>
                         <td><a href="{% url 'player_statistics' player.player.username %}">{{ player.player.username }}</a></td>
                         <td>{{ player.average_place }}</td>
-                        <td><span class="label label-{% if player.rate > 0 %}success{% else %}danger{% endif %}">{{ player.rate }}</span></td>
+                        <td><span class="label label-{% if player.rate > 0 %}success{% else %}danger{% endif %}">{{ player.rate|floatformat:2 }}</span></td>
                     </tr>
                 {% endfor %}
             </table>
@@ -37,7 +37,7 @@
                             {% for item in game.parsed_result %}
                                 <span>
                                     {{ item.player }}
-                                    <span class="label label-{% if item.rate > 0 %}success{% else %}danger{% endif %}">{{ item.rate }}</span>
+                                    <span class="label label-{% if item.rate > 0 %}success{% else %}danger{% endif %}">{{ item.rate|floatformat:2 }}</span>
                                 </span>
                             {% endfor %}
                         </td>
