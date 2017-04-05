@@ -17,7 +17,6 @@ def player_statistics(request, player_name):
     win_rounds = rounds.filter(is_win=True).count()
     open_hand_rounds = rounds.filter(is_open_hand=True).count()
     riichi_rounds = rounds.filter(is_riichi=True).count()
-    damaten_rounds = rounds.filter(is_damaten=True).count()
 
     feed_rate = (deal_rounds / total_rounds) * 100
     win_rate = (win_rounds / total_rounds) * 100
@@ -26,24 +25,24 @@ def player_statistics(request, player_name):
 
     riichi_successful = rounds.filter(is_riichi=True, is_win=True).count()
     riichi_failed = riichi_rounds - riichi_successful
-    riichi_successful = (riichi_successful / riichi_rounds) * 100
-    riichi_failed = (riichi_failed / riichi_rounds) * 100
+    riichi_successful = riichi_rounds and (riichi_successful / riichi_rounds) * 100 or 0
+    riichi_failed = riichi_rounds and (riichi_failed / riichi_rounds) * 100 or 0
 
     win_with_riichi = rounds.filter(is_riichi=True, is_win=True).count()
     win_with_open_hand = rounds.filter(is_open_hand=True, is_win=True).count()
     win_with_damaten = rounds.filter(is_damaten=True, is_win=True).count()
-    win_with_riichi = (win_with_riichi / win_rounds) * 100
-    win_with_open_hand = (win_with_open_hand / win_rounds) * 100
-    win_with_damaten = (win_with_damaten / win_rounds) * 100
+    win_with_riichi = win_rounds and (win_with_riichi / win_rounds) * 100 or 0
+    win_with_open_hand = win_rounds and (win_with_open_hand / win_rounds) * 100 or 0
+    win_with_damaten = win_rounds and (win_with_damaten / win_rounds) * 100 or 0
 
     feed_when_riichi = rounds.filter(is_riichi=True, is_deal=True).count()
-    other_feed = ((deal_rounds - feed_when_riichi) / deal_rounds) * 100
-    feed_when_riichi = (feed_when_riichi / deal_rounds) * 100
+    other_feed = deal_rounds and ((deal_rounds - feed_when_riichi) / deal_rounds) * 100 or 0
+    feed_when_riichi = deal_rounds and (feed_when_riichi / deal_rounds) * 100 or 0
 
     call_and_win = rounds.filter(is_open_hand=True, is_win=True).count()
     call_and_deal = rounds.filter(is_open_hand=True, is_deal=True).count()
-    call_and_win = (call_and_win / open_hand_rounds) * 100
-    call_and_deal = (call_and_deal / open_hand_rounds) * 100
+    call_and_win = open_hand_rounds and (call_and_win / open_hand_rounds) * 100 or 0
+    call_and_deal = open_hand_rounds and (call_and_deal / open_hand_rounds) * 100 or 0
     call_and_other = 100 - call_and_deal - call_and_win
 
     average_position = games.aggregate(Avg('player_position'))['player_position__avg']
