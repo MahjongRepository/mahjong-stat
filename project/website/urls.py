@@ -6,5 +6,4 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
 
     url(r'^', include('website.games.urls')),
-    url(r'^', include('website.events.urls')),
 ]
