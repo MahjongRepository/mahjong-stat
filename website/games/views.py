@@ -67,7 +67,7 @@ def player_statistics(request, player_name):
 
     return render(request, 'website/player_statistics.html', {
         'player': player,
-        'games': games[:20],
+        'games': games[:40],
         'total_games': total_games,
 
         'average_position': average_position,
