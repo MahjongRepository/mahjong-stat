@@ -11,13 +11,16 @@ from website.games.models import Game
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
-        parser.add_argument('meta_file', type=str)
         parser.add_argument('token', type=str)
+        parser.add_argument('host', type=str)
+        parser.add_argument('meta_file', type=str)
+        parser.add_argument('username', type=str)
 
     def handle(self, *args, **options):
-        url = 'http://localhost:8000/api/v1/tenhou/game/add/'
+        url = '{}/api/v1/tenhou/game/add/'.format(options['host'])
         token = options['token']
         meta_file = options['meta_file']
+        username = options['username']
 
         records_to_add = []
         if os.path.exists(meta_file):
@@ -26,6 +29,5 @@ class Command(BaseCommand):
 
         for item in records_to_add:
             game_id = item.split('&')[0].split('=')[1]
-
-            if not Game.objects.filter(external_id=game_id).exists():
-                requests.post(url, {'id': game_id}, headers={'Token': token})
+            requests.post(url, {'id': game_id, 'username': username}, headers={'Token': token})
+            print('Added {}'.format(game_id))

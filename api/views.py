@@ -10,22 +10,23 @@ from website.games.models import Game, GameRound
 @csrf_exempt
 def add_tenhou_game(request):
     log_id = request.POST.get('id')
-    players = request.user.players.all()
-    usernames = players.values_list('username', flat=True)
+    username = request.POST.get('username')
 
-    if not log_id or not usernames:
+    if not log_id or not username:
         return JsonResponse({'success': False})
 
-    if Game.objects.filter(external_id=log_id, game_place=Game.TENHOU).exists():
+    player = request.user.players.filter(username=username).first()
+    if not player:
+        return JsonResponse({'success': False})
+
+    if Game.objects.filter(external_id=log_id, game_place=Game.TENHOU, player__username=username).exists():
         return JsonResponse({'success': False})
 
     results = TenhouLogParser().parse_log(log_id)
 
-    player_data = next((i for i in results['players'] if i['name'] in usernames), None)
+    player_data = next((i for i in results['players'] if i['name'] == username), None)
     if not player_data:
         return JsonResponse({'success': False})
-
-    player = players.get(username=player_data['name'])
 
     game = Game.objects.create(
         player=player,

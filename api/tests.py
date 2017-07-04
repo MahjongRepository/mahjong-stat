@@ -17,11 +17,13 @@ class ApiTestCase(TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_add_new_game_record(self):
+        username = u'ばーや'
         token = ApiToken.objects.create(user=self.user)
-        player = Player.objects.create(user=self.user, username=u'ばーや')
+        player = Player.objects.create(user=self.user, username=username)
 
         data = {
             'id': '2016051813gm-0001-0000-d455c767',
+            'username': username
         }
         response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
         self.assertEqual(response.status_code, 200)
@@ -43,8 +45,10 @@ class ApiTestCase(TestCase):
 
         data = {
             'id': '2016051813gm-0001-0000-d455c767',
+            'username': 'NoName'
         }
-        self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
+        response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
+        self.assertEqual(response.json()['success'], True)
 
         response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
         self.assertEqual(response.status_code, 200)
@@ -54,6 +58,7 @@ class ApiTestCase(TestCase):
         token = ApiToken.objects.create(user=self.user)
         data = {
             'id': '',
+            'username': ''
         }
         response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
         self.assertEqual(response.status_code, 200)
@@ -65,6 +70,7 @@ class ApiTestCase(TestCase):
         token = ApiToken.objects.create(user=User.objects.create_user('test', 'test1@test.com'))
         data = {
             'id': '1',
+            'username': '1'
         }
         response = self.client.post(reverse('api_add_tenhou_game'), data, **{'HTTP_TOKEN': token.token})
         self.assertEqual(response.status_code, 200)
