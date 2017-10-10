@@ -1,6 +1,6 @@
 from django.db import models
 
-from tenhou_log_parser.constants import MahjongConstants
+from parsers.tenhou.constants import MahjongConstants
 from website.accounts.models import Player
 
 

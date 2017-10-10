@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from api.decorators import token_authentication
-from tenhou_log_parser.main import TenhouLogParser
+from parsers.tenhou.main import TenhouLogParser
 from website.games.models import Game, GameRound
 
 

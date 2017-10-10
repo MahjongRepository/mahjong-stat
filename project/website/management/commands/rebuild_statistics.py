@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from tenhou_log_parser.main import TenhouLogParser
+from parsers.tenhou.main import TenhouLogParser
 from website.accounts.models import Player
 from website.games.models import Game, GameRound
 

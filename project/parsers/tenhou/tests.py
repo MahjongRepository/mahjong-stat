@@ -3,8 +3,8 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 
-from tenhou_log_parser.constants import MahjongConstants
-from tenhou_log_parser.main import TenhouLogParser
+from parsers.tenhou.constants import MahjongConstants
+from parsers.tenhou.main import TenhouLogParser
 
 
 class TestCaseMixin(object):

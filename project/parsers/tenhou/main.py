@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.utils import timezone
 
-from tenhou_log_parser.constants import MahjongConstants
+from parsers.tenhou.constants import MahjongConstants
 
 logs_temp_directory = os.path.join(settings.BASE_DIR, 'tests_temp_data')
 
