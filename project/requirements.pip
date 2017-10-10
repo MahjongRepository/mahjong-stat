@@ -1,4 +1,4 @@
-Django==1.10.6
-beautifulsoup4==4.5.3
-requests==2.13.0
-psycopg2==2.7
+Django==1.11.6
+beautifulsoup4==4.6.0
+requests==2.18.4
+psycopg2==2.7.3.1
