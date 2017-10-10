@@ -1,7 +1,7 @@
 from django.db import models
 
 from tenhou_log_parser.constants import MahjongConstants
-from website.accounts.models import User, Player
+from website.accounts.models import Player
 
 
 class Game(models.Model, MahjongConstants):

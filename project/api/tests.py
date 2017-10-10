@@ -1,8 +1,9 @@
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 
 from api.models import ApiToken
-from website.accounts.models import User, Player
+from website.accounts.models import Player
 from website.games.models import Game
 
 
@@ -67,7 +68,7 @@ class ApiTestCase(TestCase):
         self.assertEqual(Game.objects.all().count(), 0)
 
     def test_add_new_tenhou_game_without_players(self):
-        token = ApiToken.objects.create(user=User.objects.create_user('test', 'test1@test.com'))
+        token = ApiToken.objects.create(user=self.user)
         data = {
             'id': '1',
             'username': '1'

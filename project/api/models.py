@@ -1,7 +1,7 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 from api.utils import make_random_letters_and_digit_string
-from website.accounts.models import User
 
 
 class ApiToken(models.Model):
