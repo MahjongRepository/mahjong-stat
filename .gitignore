@@ -6,7 +6,7 @@ __pycache__
 .DS_Store
 logs
 collected_static
-local_settings.py
+settings_local.py
 mahjong.db
 
 meta.txt

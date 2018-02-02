@@ -126,6 +126,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 IS_TEST_RUN = sys.argv[1:2] == ['test']
 
 try:
-    from .local_settings import *
+    from .settings_local import *
 except:
     pass
