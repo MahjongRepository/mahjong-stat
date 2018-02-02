@@ -1,4 +1,4 @@
-Django==1.11.6
+Django==1.11.10
 beautifulsoup4==4.6.0
 requests==2.18.4
-psycopg2==2.7.3.1
+psycopg2==2.7.3.2
