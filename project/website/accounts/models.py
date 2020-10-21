@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser, PermissionsMixin, User
 
 
 class Player(models.Model):
-    user = models.ForeignKey(User, related_name='players')
+    user = models.ForeignKey(User, related_name='players', on_delete=models.CASCADE)
     username = models.CharField(max_length=255)
 
     created_at = models.DateTimeField(auto_now_add=True)

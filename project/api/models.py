@@ -5,7 +5,7 @@ from api.utils import make_random_letters_and_digit_string
 
 
 class ApiToken(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=60)
 
     created_at = models.DateTimeField(auto_now_add=True)

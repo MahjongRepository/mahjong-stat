@@ -316,7 +316,7 @@ class TenhouLogParser(MahjongConstants):
         return log_data
 
     def _download_log(self, log_id):
-        resp = urlopen('http://e.mjv.jp/0/log/?' + log_id)
+        resp = urlopen('http://tenhou.net/0/log/?' + log_id)
         data = resp.read()
         return data
 

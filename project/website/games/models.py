@@ -12,7 +12,7 @@ class Game(models.Model, MahjongConstants):
         (TENHOU, 'Tenhou game'),
     )
 
-    player = models.ForeignKey(Player, related_name='games')
+    player = models.ForeignKey(Player, related_name='games', on_delete=models.CASCADE)
 
     game_place = models.PositiveSmallIntegerField(choices=GAMES, default=TENHOU)
     game_rule = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_RULES, default=MahjongConstants.UNKNOWN)
@@ -43,7 +43,7 @@ class Game(models.Model, MahjongConstants):
 
 
 class GameRound(models.Model):
-    game = models.ForeignKey(Game, related_name='rounds')
+    game = models.ForeignKey(Game, related_name='rounds', on_delete=models.CASCADE)
 
     is_win = models.BooleanField(default=False)
     # deal to ron
