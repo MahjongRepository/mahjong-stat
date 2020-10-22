@@ -2,14 +2,14 @@
 {% load humanize %}
 
 {% block content %}
-    <div class="page-header">
-        <h3>{{ player.username }}</h3>
-        <span>{{ games.0.get_rank_display }} R{{ games.0.rate|floatformat:0 }}</span>
+    <div class="mt-2">
+        <h3 style="display: inline-block" class="align-middle">{{ player.username }}</h3>
+        <span class="badge badge-info text-wrap align-middle">{{ games.0.get_rank_display }} R{{ games.0.rate|floatformat:0 }}</span>
     </div>
-    <div class="row">
+    <div class="row mt-2">
         <div class="col-lg-3">
-            <table class="table table-bordered">
-                <tr class="success">
+            <table class="table table-bordered table-sm">
+                <tr class="table-success">
                     <td>Win Rate</td>
                     <td>{{ win_rate|floatformat:-2 }}%</td>
                 </tr>
@@ -25,7 +25,7 @@
                     <td>Win when damaten</td>
                     <td>{{ win_with_damaten|floatformat:-2 }}%</td>
                 </tr>
-                <tr class="success">
+                <tr class="table-success">
                     <td>Feed rate</td>
                     <td>{{ feed_rate|floatformat:-2 }}%</td>
                 </tr>
@@ -37,7 +37,7 @@
                     <td>Other</td>
                     <td>{{ other_feed|floatformat:-2 }}%</td>
                 </tr>
-                <tr class="success">
+                <tr class="table-success">
                     <td>Riichi rate</td>
                     <td>{{ riichi_rate|floatformat:-2 }}%</td>
                 </tr>
@@ -49,7 +49,7 @@
                     <td>Failed riichi</td>
                     <td>{{ riichi_failed|floatformat:-2 }}%</td>
                 </tr>
-                <tr class="success">
+                <tr class="table-success">
                     <td>Call rate</td>
                     <td>{{ call_rate|floatformat:-2 }}%</td>
                 </tr>
@@ -69,8 +69,8 @@
         </div>
 
         <div class="col-lg-3">
-            <table class="table table-bordered">
-                <tr class="success">
+            <table class="table table-bordered table-sm">
+                <tr class="table-success">
                     <td>Averages</td>
                     <td></td>
                 </tr>
@@ -90,8 +90,8 @@
         </div>
 
         <div class="col-lg-3">
-            <table class="table table-bordered">
-                <tr class="success">
+            <table class="table table-bordered table-sm">
+                <tr class="table-success">
                     <td>Positions</td>
                     <td></td>
                 </tr>
@@ -142,10 +142,10 @@
                     </tr>
                     <tr>
                         <td colspan="5">
-                            <table class="table table-hover table-condensed">
+                            <table class="table table-hover table-sm table-borderless">
                                 {% for round in game.rounds.all %}
                                     <tr>
-                                        <td style="width: 40px">
+                                        <td style="width: 50px">
                                             {{ round.round_number_display }}
                                         </td>
                                         <td>
@@ -177,7 +177,7 @@
                                             {% endif %}
 
                                             {% if round.is_damaten %}
-                                                <span class="label label-success">damaten</span>
+                                                <span class="label label-table-success">damaten</span>
                                             {% endif %}
                                         </td>
                                         <td>
