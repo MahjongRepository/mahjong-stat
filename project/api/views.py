@@ -46,7 +46,7 @@ def finish_tenhou_game(request):
     except Game.DoesNotExist:
         return JsonResponse({'success': False})
 
-    return game._load_log_and_update_game(game)
+    return _load_log_and_update_game(game)
 
 
 def _load_log_and_update_game(game):
