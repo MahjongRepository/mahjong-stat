@@ -5,20 +5,21 @@ from website.accounts.models import Player
 
 
 class Game(models.Model, MahjongConstants):
-    REAL_LIFE = 1
-    TENHOU = 2
-    GAMES = (
-        (REAL_LIFE, 'Real life game record'),
-        (TENHOU, 'Tenhou game'),
-    )
+    STARTED = 0
+    FINISHED = 1
+    STATUSES = [
+        [STARTED, 'Started'],
+        [FINISHED, 'Finished'],
+    ]
 
     player = models.ForeignKey(Player, related_name='games', on_delete=models.CASCADE)
 
-    game_place = models.PositiveSmallIntegerField(choices=GAMES, default=TENHOU)
     game_rule = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_RULES, default=MahjongConstants.UNKNOWN)
     game_type = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_TYPES, default=MahjongConstants.UNKNOWN)
     lobby = models.PositiveSmallIntegerField(default=0)
     game_date = models.DateTimeField(default=None, null=True, blank=True)
+
+    status = models.PositiveSmallIntegerField(choices=STATUSES)
 
     # let's store all games contents
     # to be able rebuild statistics in future without a lot of downloads from tenhou servers

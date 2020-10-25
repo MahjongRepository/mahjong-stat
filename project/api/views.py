@@ -8,7 +8,7 @@ from website.games.models import Game, GameRound
 
 @token_authentication
 @csrf_exempt
-def add_tenhou_game(request):
+def start_tenhou_game(request):
     log_id = request.POST.get('id')
     username = request.POST.get('username')
 
@@ -19,7 +19,31 @@ def add_tenhou_game(request):
     if not player:
         return JsonResponse({'success': False})
 
-    if Game.objects.filter(external_id=log_id, game_place=Game.TENHOU, player__username=username).exists():
+    Game.objects.create(
+        player=player,
+        external_id=log_id,
+        status=Game.STARTED
+    )
+
+    return JsonResponse({'success': True})
+
+
+@token_authentication
+@csrf_exempt
+def finish_tenhou_game(request):
+    log_id = request.POST.get('id')
+    username = request.POST.get('username')
+
+    if not log_id or not username:
+        return JsonResponse({'success': False})
+
+    player = request.user.players.filter(username=username).first()
+    if not player:
+        return JsonResponse({'success': False})
+
+    try:
+        game = Game.objects.get(player=player, external_id=log_id)
+    except Game.DoesNotExist:
         return JsonResponse({'success': False})
 
     results = TenhouLogParser().parse_log(log_id)
@@ -28,21 +52,18 @@ def add_tenhou_game(request):
     if not player_data:
         return JsonResponse({'success': False})
 
-    game = Game.objects.create(
-        player=player,
-        external_id=log_id,
-        player_position=player_data['position'],
-        scores=player_data['scores'],
-        seat=player_data['seat'],
-        rate=player_data['rate'],
-        rank=player_data['rank'],
-        game_place=Game.TENHOU,
-        game_rule=results['game_rule'],
-        game_type=results['game_type'],
-        game_date=results['game_date'],
-        lobby=results['lobby'],
-        game_log_content=results['log_data']
-    )
+    game.player_position = player_data['position']
+    game.scores = player_data['scores']
+    game.seat = player_data['seat']
+    game.rate = player_data['rate']
+    game.rank = player_data['rank']
+    game.game_rule = results['game_rule']
+    game.game_type = results['game_type']
+    game.game_date = results['game_date']
+    game.lobby = results['lobby']
+    game.game_log_content = results['log_data']
+
+    game.save()
 
     for round_data in player_data['rounds']:
         GameRound.objects.create(
