@@ -128,3 +128,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 IS_TEST_RUN = sys.argv[1:2] == ['test']
+
+try:
+    from .settings_local import *
+except:
+    pass

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
+from django.urls import reverse
 
 from api.models import ApiToken
 from website.accounts.models import Player
