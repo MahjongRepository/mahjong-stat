@@ -1,14 +1,16 @@
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Avg
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 
+from api.views import _load_log_and_update_game
 from website.accounts.models import Player
-from website.games.models import GameRound
+from website.games.models import GameRound, Game
 
 
 def player_statistics(request, player_name):
     player = get_object_or_404(Player, username=player_name)
 
-    games = player.games.all().order_by('-game_date', '-id')
+    games = player.games.filter(status=Game.FINISHED).order_by('-game_date', '-id')
     total_games = games.count()
 
     rounds = GameRound.objects.filter(game__player=player)
@@ -99,3 +101,10 @@ def player_statistics(request, player_name):
         'call_and_deal': call_and_deal,
         'call_and_other': call_and_other,
     })
+
+
+@staff_member_required
+def manually_load_results(request, game_id):
+    game = Game.objects.get(id=game_id)
+    _load_log_and_update_game(game)
+    return redirect(request.META['HTTP_REFERER'])

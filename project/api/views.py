@@ -46,12 +46,17 @@ def finish_tenhou_game(request):
     except Game.DoesNotExist:
         return JsonResponse({'success': False})
 
-    results = TenhouLogParser().parse_log(log_id)
+    return game._load_log_and_update_game(game)
 
-    player_data = next((i for i in results['players'] if i['name'] == username), None)
+
+def _load_log_and_update_game(game):
+    results = TenhouLogParser().parse_log(game.external_id)
+
+    player_data = next((i for i in results['players'] if i['name'] == game.player.username), None)
     if not player_data:
         return JsonResponse({'success': False})
 
+    game.status = Game.FINISHED
     game.player_position = player_data['position']
     game.scores = player_data['scores']
     game.seat = player_data['seat']
