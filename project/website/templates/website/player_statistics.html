@@ -146,7 +146,9 @@
                                 {% for round in game.rounds.all %}
                                     <tr>
                                         <td style="width: 50px">
-                                            {{ round.round_number_display }}
+                                            <a href="{{ game.get_tenhou_url }}&ts={{ forloop.counter0 }}" target="_blank">
+                                                {{ round.round_number_display }}
+                                            </a>
                                         </td>
                                         <td>
                                             {% if round.is_riichi %}
@@ -169,7 +171,7 @@
                                             {% endif %}
 
                                             {% if round.is_retake %}
-                                                Retake
+                                                Redraw
                                             {% endif %}
 
                                             {% if not round.is_win and not round.is_deal and not round.is_retake and not round.is_riichi and not round.lose_scores %}
@@ -177,7 +179,7 @@
                                             {% endif %}
 
                                             {% if round.is_damaten %}
-                                                <span class="label label-table-success">damaten</span>
+                                                <span class="badge badge-success">damaten</span>
                                             {% endif %}
                                         </td>
                                         <td>
