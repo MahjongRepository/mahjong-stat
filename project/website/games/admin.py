@@ -9,7 +9,7 @@ class GameAdmin(admin.ModelAdmin):
     search_fields = ['external_id']
     ordering = ['-updated_at']
     list_filter = ['player__username', 'status']
-    list_display = ['id', 'player_link', 'place', 'scores', 'status', 'created_at', 'updated_at', 'action']
+    list_display = ['id', 'player_link', 'place', 'scores', 'status', 'updated_at', 'action']
 
     def place(self, obj):
         return obj.player_position
