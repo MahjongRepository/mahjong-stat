@@ -7,13 +7,38 @@ from website.accounts.models import Player
 from website.games.models import GameRound, Game
 
 
+def total_statistics(request):
+    games = Game.objects.filter(status=Game.FINISHED).order_by('-game_date', '-id')
+    players = Player.objects.all()
+    total_games = games.count()
+
+    response_data = {
+        'total_games': total_games,
+        'games': games[:40],
+    }
+    response_data.update(_build_stat(games, players))
+    return render(request, 'website/player_statistics.html', response_data)
+
+
 def player_statistics(request, player_name):
     player = get_object_or_404(Player, username=player_name)
 
     games = player.games.filter(status=Game.FINISHED).order_by('-game_date', '-id')
     total_games = games.count()
 
-    rounds = GameRound.objects.filter(game__player=player)
+    response_data = {
+        'player': player,
+        'games': games[:40],
+        'total_games': total_games,
+    }
+    response_data.update(_build_stat(games, [player]))
+    return render(request, 'website/player_statistics.html', response_data)
+
+
+def _build_stat(games, players):
+    total_games = games.count()
+
+    rounds = GameRound.objects.filter(game__player__in=players)
     total_rounds = rounds.count()
     deal_rounds = rounds.filter(is_deal=True).count()
     win_rounds = rounds.filter(is_win=True).count()
@@ -49,11 +74,11 @@ def player_statistics(request, player_name):
 
     average_position = games.aggregate(Avg('player_position'))['player_position__avg']
     average_deal_scores = (rounds
-                           .filter(is_deal=True)
-                           .aggregate(Avg('lose_scores'))['lose_scores__avg'])
+        .filter(is_deal=True)
+        .aggregate(Avg('lose_scores'))['lose_scores__avg'])
     average_win_scores = (rounds
-                          .filter(is_win=True)
-                          .aggregate(Avg('win_scores'))['win_scores__avg'])
+        .filter(is_win=True)
+        .aggregate(Avg('win_scores'))['win_scores__avg'])
 
     first_position_games = games.filter(player_position=1).count()
     second_position_games = games.filter(player_position=2).count()
@@ -67,11 +92,7 @@ def player_statistics(request, player_name):
     fourth_position_rate = (fourth_position_games / total_games) * 100
     bankruptcy_rate = (bankruptcy_games / total_games) * 100
 
-    return render(request, 'website/player_statistics.html', {
-        'player': player,
-        'games': games[:40],
-        'total_games': total_games,
-
+    return {
         'average_position': average_position,
         'average_deal_scores': average_deal_scores,
         'average_win_scores': average_win_scores,
@@ -100,7 +121,7 @@ def player_statistics(request, player_name):
         'call_and_win': call_and_win,
         'call_and_deal': call_and_deal,
         'call_and_other': call_and_other,
-    })
+    }
 
 
 @staff_member_required

@@ -2,10 +2,17 @@
 {% load humanize %}
 
 {% block content %}
-    <div class="mt-2">
-        <h3 style="display: inline-block" class="align-middle">{{ player.username }}</h3>
-        <span class="badge badge-info text-wrap align-middle">{{ games.0.get_rank_display }} R{{ games.0.rate|floatformat:0 }}</span>
-    </div>
+    {% if player %}
+        <div class="mt-2">
+            <h3 style="display: inline-block" class="align-middle">{{ player.username }}</h3>
+            <span class="badge badge-info text-wrap align-middle">{{ games.0.get_rank_display }} R{{ games.0.rate|floatformat:0 }}</span>
+            <a href="https://nodocchi.moe/tenhoulog/#!&name={{ player.username }}" target="_blank">[Nodochi]</a>
+        </div>
+    {% else %}
+        <div class="mt-2">
+            <h3 style="display: inline-block" class="align-middle">Total</h3>
+        </div>
+    {% endif %}
     <div class="row mt-2">
         <div class="col-lg-3">
             <table class="table table-bordered table-sm">
