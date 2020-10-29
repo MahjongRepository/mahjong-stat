@@ -9,7 +9,7 @@ class GameAdmin(admin.ModelAdmin):
     search_fields = ['external_id']
     ordering = ['-updated_at']
     list_filter = ['player__username', 'status']
-    list_display = ['id', 'player', 'place', 'scores', 'status', 'updated_at', 'action']
+    list_display = ['id', 'player_link', 'place', 'scores', 'status', 'updated_at', 'action']
 
     def place(self, obj):
         return obj.player_position
@@ -20,7 +20,7 @@ class GameAdmin(admin.ModelAdmin):
             return format_html(f'<a href="{url}">Load results</a>')
         return ''
 
-    def player(self, obj):
+    def player_link(self, obj):
         url = reverse('player_statistics', kwargs={'player_name': obj.player.username})
         return format_html(f'<a href="{url}" target="_blank">{obj.player.username}</a>')
 
