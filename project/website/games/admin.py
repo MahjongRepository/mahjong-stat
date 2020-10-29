@@ -28,7 +28,7 @@ class GameAdmin(admin.ModelAdmin):
 class GameRoundAdmin(admin.ModelAdmin):
     list_display = ['id', 'player_link', 'game_link', 'win_scores', 'lose_scores', 'han', 'fu', 'date']
     list_filter = ['game__game_date', 'is_win', 'is_deal']
-    ordering = ['game__game_date']
+    ordering = ['-game__game_date']
 
     def player_link(self, obj):
         username = obj.game.player.username
