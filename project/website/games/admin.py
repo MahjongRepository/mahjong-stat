@@ -26,11 +26,11 @@ class GameAdmin(admin.ModelAdmin):
 
 
 class GameRoundAdmin(admin.ModelAdmin):
-    list_display = ['id', 'player', 'game_link', 'win_scores', 'lose_scores', 'han', 'fu', 'date']
+    list_display = ['id', 'player_link', 'game_link', 'win_scores', 'lose_scores', 'han', 'fu', 'date']
     list_filter = ['game__game_date', 'is_win', 'is_deal']
     ordering = ['game__game_date']
 
-    def player(self, obj):
+    def player_link(self, obj):
         username = obj.game.player.username
         url = reverse('player_statistics', kwargs={'player_name': username})
         return format_html(f'<a href="{url}" target="_blank">{username}</a>')
