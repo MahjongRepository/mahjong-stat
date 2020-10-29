@@ -59,6 +59,12 @@ class GameRound(models.Model):
     round_number = models.PositiveSmallIntegerField(default=0)
     honba = models.PositiveSmallIntegerField(default=0)
 
+    # use it for direct link to the game round
+    round_counter = models.PositiveSmallIntegerField(default=0)
+
+    han = models.PositiveSmallIntegerField(default=0)
+    fu = models.PositiveSmallIntegerField(default=0)
+
     win_scores = models.PositiveIntegerField(default=0)
     lose_scores = models.PositiveIntegerField(default=0)
 
@@ -72,3 +78,6 @@ class GameRound(models.Model):
     def round_number_display(self):
         rounds = [u'東', u'南', u'西', u'北']
         return '{0}{1}'.format(rounds[self.round_number // 4], self.round_number + 1)
+
+    def get_tenhou_url_for_round(self):
+        return self.game.get_tenhou_url() + f'&ts={self.round_counter}'

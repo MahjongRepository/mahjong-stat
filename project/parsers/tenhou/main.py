@@ -93,6 +93,15 @@ class TenhouLogParser(MahjongConstants):
                             lose_scores[seat] = score * -1
                         seat += 1
 
+                han = 0
+                fu = ten[0]
+                if 'yaku' in tag.attrs:
+                    han = sum([int(x) for x in tag.attrs['yaku'].split(',')[1::2]])
+
+                if 'yakuman' in tag.attrs:
+                    # TODO save real yakuman value
+                    han = 32
+
                 if round_data:
                     round_data['winners'].append(winner)
                 else:
@@ -105,7 +114,9 @@ class TenhouLogParser(MahjongConstants):
                         'round_number': round_number,
                         'honba': honba,
                         'win_scores': win_scores,
-                        'lose_scores': lose_scores
+                        'lose_scores': lose_scores,
+                        'han': han,
+                        'fu': fu,
                     }
 
             # retake
@@ -162,6 +173,8 @@ class TenhouLogParser(MahjongConstants):
                     'is_damaten': False,
                     'round_number': round_data['round_number'],
                     'honba': round_data['honba'],
+                    'han': round_data.get('han', 0),
+                    'fu': round_data.get('fu', 0),
                     'win_scores': 0,
                     'lose_scores': 0,
                 }

@@ -50,7 +50,7 @@ def finish_tenhou_game(request):
 
 
 def _load_log_and_update_game(game):
-    results = TenhouLogParser().parse_log(game.external_id)
+    results = TenhouLogParser().parse_log(game.external_id, game.game_log_content)
 
     player_data = next((i for i in results['players'] if i['name'] == game.player.username), None)
     if not player_data:
@@ -70,7 +70,7 @@ def _load_log_and_update_game(game):
 
     game.save()
 
-    for round_data in player_data['rounds']:
+    for i, round_data in enumerate(player_data['rounds']):
         GameRound.objects.create(
             game=game,
             is_win=round_data['is_win'],
@@ -84,6 +84,9 @@ def _load_log_and_update_game(game):
             honba=round_data['honba'],
             win_scores=round_data['win_scores'],
             lose_scores=round_data['lose_scores'],
+            han=round_data.get('han', 0),
+            fu=round_data.get('fu', 0),
+            round_counter=i,
         )
 
     return JsonResponse({'success': True})
