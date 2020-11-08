@@ -103,7 +103,7 @@ class TenhouLogParser(MahjongConstants):
 
                 if 'yakuman' in tag.attrs:
                     # TODO save real yakuman value
-                    han = 32
+                    han = 13
 
                 if round_data:
                     round_data['winners'].append(winner)
