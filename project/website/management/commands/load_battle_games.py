@@ -49,4 +49,7 @@ class Command(BaseCommand):
                 )
 
             for game in games:
-                _load_log_and_update_game(game)
+                try:
+                    _load_log_and_update_game(game)
+                except Exception:
+                    print(f"Error {log_id}")
