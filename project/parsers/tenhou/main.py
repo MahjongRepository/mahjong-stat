@@ -31,7 +31,10 @@ class TenhouLogParser(MahjongConstants):
 
         game_date = log_id.split('-')[0]
         # 2016052113gm
-        game_date = datetime.strptime(game_date, '%Y%m%d%Hgm').replace(tzinfo=timezone.utc)
+        if 'gm' in game_date:
+            game_date = datetime.strptime(game_date, '%Y%m%d%Hgm').replace(tzinfo=timezone.utc)
+        else:  # local games battle
+            game_date = datetime.utcnow().replace(tzinfo=timezone.utc)
 
         # tenhou produced not valid XML, so let's use BeautifulSoup for parsing
         soup = BeautifulSoup(log_data, 'html.parser')

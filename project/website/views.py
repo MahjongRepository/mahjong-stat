@@ -1,5 +1,9 @@
 from django.http import HttpResponse
+from django.shortcuts import render
+
+from website.accounts.models import Player
 
 
 def home(request):
-    return HttpResponse('Hello')
+    players = Player.objects.all()
+    return render(request, 'home.html', {'players': players})

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row mt-4">
+        <ul>
+            {% for player in players %}
+                <li><a href="{% url 'player_statistics' player.username %}">{{ player.username }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
