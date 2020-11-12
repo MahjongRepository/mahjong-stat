@@ -1,3 +1,5 @@
+import csv
+import statistics
 import tarfile
 
 from django.contrib.auth.models import User
@@ -7,6 +9,7 @@ from tqdm import tqdm
 from api.views import _load_log_and_update_game
 from website.accounts.models import Player
 from website.games.models import Game
+from django.db.models import Avg
 
 
 class Command(BaseCommand):
@@ -25,6 +28,8 @@ class Command(BaseCommand):
         # erase old state
         Game.objects.all().delete()
 
+        i = 0
+        results = []
         tar = tarfile.open(options['replays_path'], "r:gz")
         for member in tqdm(tar.getmembers()):
             f = tar.extractfile(member)
@@ -53,3 +58,27 @@ class Command(BaseCommand):
                     _load_log_and_update_game(game)
                 except Exception:
                     print(f"Error {log_id}")
+
+            if i % 100 == 0:
+                result_item = {
+                    'games': i,
+                }
+                avgs = []
+                for player in players:
+                    games = Game.objects.filter(player=player).order_by()
+                    average_position = games.aggregate(Avg('player_position'))['player_position__avg']
+                    avgs.append(average_position)
+                    result_item[player.username] = average_position
+
+                result_item['dispersion'] = max(avgs) - min(avgs)
+                result_item['variation_25'] = max(abs(max(avgs) - 2.5), abs(min(avgs) - 2.5))
+                result_item['stdev'] = statistics.stdev(avgs)
+                results.append(result_item)
+
+            i += 1
+
+        with open('results.csv', 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=results[0].keys())
+            writer.writeheader()
+            for data in results:
+                writer.writerow(data)

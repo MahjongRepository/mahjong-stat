@@ -26,7 +26,7 @@ class GameAdmin(admin.ModelAdmin):
 
 
 class GameRoundAdmin(admin.ModelAdmin):
-    list_display = ['id', 'player_link', 'game_link', 'win_scores', 'lose_scores', 'han', 'fu', 'date']
+    list_display = ['id', 'player_link', 'game_link', 'external_id', 'win_scores', 'lose_scores', 'han', 'fu', 'date']
     list_filter = ['game__game_date', 'is_win', 'is_deal']
     ordering = ['-game__game_date']
 
@@ -40,6 +40,9 @@ class GameRoundAdmin(admin.ModelAdmin):
 
     def date(self, obj):
         return obj.game.game_date
+
+    def external_id(self, obj):
+        return obj.game.external_id
 
 
 admin.site.register(Game, GameAdmin)
