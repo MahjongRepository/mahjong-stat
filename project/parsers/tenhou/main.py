@@ -439,7 +439,7 @@ class TenhouLogParser(MahjongConstants):
                 with open(log_file, 'wb') as f:
                     f.write(log_data)
 
-        return log_data
+        return log_data.decode('utf-8')
 
     def _download_log(self, log_id):
         resp = urlopen('http://tenhou.net/0/log/?' + log_id)

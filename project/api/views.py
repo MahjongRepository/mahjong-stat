@@ -35,16 +35,16 @@ def finish_tenhou_game(request):
     username = request.POST.get('username')
 
     if not log_id or not username:
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'reason': 1})
 
     player = request.user.players.filter(username=username).first()
     if not player:
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'reason': 2})
 
     try:
         game = Game.objects.get(player=player, external_id=log_id)
     except Game.DoesNotExist:
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'reason': 3})
 
     return _load_log_and_update_game(game)
 
@@ -54,7 +54,7 @@ def _load_log_and_update_game(game):
 
     player_data = next((i for i in results['players'] if i['name'] == game.player.username), None)
     if not player_data:
-        return JsonResponse({'success': False})
+        return JsonResponse({'success': False, 'reason': 4})
 
     game.status = Game.FINISHED
     game.player_position = player_data['position']
