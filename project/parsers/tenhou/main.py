@@ -55,7 +55,7 @@ class TenhouLogParser(MahjongConstants):
                     round_number = seed[0]
                     honba = seed[1]
 
-                if "<UN" in tag:
+                if "<UN" in tag and "dan" in tag:
                     player_names = self.parse_names(tag)
                     player_rates = self.parse_rates(tag)
                     player_ranks = self.parse_ranks(tag)
