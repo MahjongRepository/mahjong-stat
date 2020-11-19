@@ -1,16 +1,16 @@
+import re
 from datetime import datetime
-from itertools import tee
 from urllib.parse import unquote
 from urllib.request import urlopen
 
 import codecs
 import os
 import struct
-from bs4 import BeautifulSoup
 from django.conf import settings
 from django.utils import timezone
 
 from parsers.tenhou.constants import MahjongConstants
+from parsers.tenhou.meld import Meld
 
 logs_temp_directory = os.path.join(settings.BASE_DIR, 'tests_temp_data')
 
@@ -36,9 +36,7 @@ class TenhouLogParser(MahjongConstants):
         else:  # local games battle
             game_date = datetime.utcnow().replace(tzinfo=timezone.utc)
 
-        # tenhou produced not valid XML, so let's use BeautifulSoup for parsing
-        soup = BeautifulSoup(log_data, 'html.parser')
-        elements = soup.find_all()
+        parsed_rounds = self.split_log_to_game_rounds(log_data)
 
         round_data = {}
         win_scores = {}
@@ -48,115 +46,113 @@ class TenhouLogParser(MahjongConstants):
         round_number = 0
         honba = 0
 
-        for tag in elements:
-            if tag.name == 'init':
-                seed = tag.attrs['seed'].split(',')
-                seed = [int(i) for i in seed]
+        for round_data_item in parsed_rounds:
+            for tag in round_data_item:
+                if self.is_init_tag(tag):
+                    seed = self.get_attribute_content(tag, 'seed').split(',')
+                    seed = [int(i) for i in seed]
 
-                round_number = seed[0]
-                honba = seed[1]
+                    round_number = seed[0]
+                    honba = seed[1]
 
-            if tag.name == 'un' and 'rate' in tag.attrs:
-                player_names = self.parse_names(tag)
-                player_rates = self.parse_rates(tag)
-                player_ranks = self.parse_ranks(tag)
+                if "<UN" in tag:
+                    player_names = self.parse_names(tag)
+                    player_rates = self.parse_rates(tag)
+                    player_ranks = self.parse_ranks(tag)
 
-            # start of the game
-            if tag.name == 'go':
-                lobby, game_rule = self.parse_game_lobby_and_rule(tag)
+                # start of the game
+                if "<GO" in tag:
+                    lobby, game_rule = self.parse_game_lobby_and_rule(tag)
 
-            # someone is win
-            if tag.name == 'agari':
-                winner = int(tag.attrs['who'])
-                from_who = int(tag.attrs['fromwho'])
+                # someone is win
+                if self.is_agari_tag(tag):
+                    winner = int(self.get_attribute_content(tag, 'who'))
+                    from_who = int(self.get_attribute_content(tag, 'fromWho'))
 
-                ten = tag.attrs['ten'].split(',')
-                ten = [int(i) for i in ten]
+                    ten = self.get_attribute_content(tag, 'ten').split(',')
+                    ten = [int(i) for i in ten]
 
-                win_scores[winner] = ten[1]
-                # in double ron we need to calculate all dealt hands
-                if from_who != winner:
-                    if from_who in lose_scores:
-                        lose_scores[from_who] += ten[1]
-                    else:
-                        lose_scores[from_who] = ten[1]
-
-                # format: sc="157,20,245,-39,376,-79,222,-39"
-                if 'sc' in tag.attrs:
-                    scores = tag.attrs['sc'].split(',')
-                    scores = [int(i) for i in scores]
-
-                    seat = 0
-                    scores = scores[1::2]
-                    for score in scores:
-                        score *= 100
-                        if score > 0:
-                            win_scores[seat] = score
+                    win_scores[winner] = ten[1]
+                    # in double ron we need to calculate all dealt hands
+                    if from_who != winner:
+                        if from_who in lose_scores:
+                            lose_scores[from_who] += ten[1]
                         else:
-                            lose_scores[seat] = score * -1
-                        seat += 1
+                            lose_scores[from_who] = ten[1]
 
-                han = 0
-                fu = ten[0]
-                if 'yaku' in tag.attrs:
-                    han = sum([int(x) for x in tag.attrs['yaku'].split(',')[1::2]])
+                    # format: sc="157,20,245,-39,376,-79,222,-39"
+                    if self.get_attribute_content(tag, 'sc'):
+                        scores = self.get_attribute_content(tag, 'sc').split(',')
+                        scores = [int(i) for i in scores]
 
-                if 'yakuman' in tag.attrs:
-                    # TODO save real yakuman value
-                    han = 13
+                        seat = 0
+                        scores = scores[1::2]
+                        for score in scores:
+                            score *= 100
+                            if score > 0:
+                                win_scores[seat] = score
+                            else:
+                                lose_scores[seat] = score * -1
+                            seat += 1
 
-                if round_data:
-                    round_data['winners'].append(winner)
-                else:
+                    han = 0
+                    fu = ten[0]
+                    if self.get_attribute_content(tag, 'yaku'):
+                        han = sum([int(x) for x in self.get_attribute_content(tag, 'yaku').split(',')[1::2]])
+
+                    if self.get_attribute_content(tag, 'yakuman'):
+                        # TODO save real yakuman value
+                        han = 13
+
+                    if round_data:
+                        round_data['winners'].append(winner)
+                    else:
+                        round_data = {
+                            'winners': [winner],
+                            'from_who': from_who,
+                            'who_open_hand': who_open_hand,
+                            'who_called_riichi': who_called_riichi,
+                            'is_retake': False,
+                            'round_number': round_number,
+                            'honba': honba,
+                            'win_scores': win_scores,
+                            'lose_scores': lose_scores,
+                            'han': han,
+                            'fu': fu,
+                        }
+
+                # retake
+                if "<RYUUKYOKU" in tag:
                     round_data = {
-                        'winners': [winner],
-                        'from_who': from_who,
-                        'who_open_hand': who_open_hand,
-                        'who_called_riichi': who_called_riichi,
-                        'is_retake': False,
+                        'is_retake': True,
                         'round_number': round_number,
                         'honba': honba,
-                        'win_scores': win_scores,
-                        'lose_scores': lose_scores,
-                        'han': han,
-                        'fu': fu,
                     }
 
-            # retake
-            if tag.name == 'ryuukyoku':
-                round_data = {
-                    'is_retake': True,
-                    'round_number': round_number,
-                    'honba': honba,
-                }
+                if "<N who=" in tag:
+                    meld = self.parse_meld(tag)
+                    if meld.opened:
+                        who_open_hand.append(int(meld.who))
 
-            if tag.name == 'n':
-                index = elements.index(tag)
-                next_tag = elements[index + 1]
-                # for closed kan next tag will be dora tag
-                # in that case we don't need to count this hand as opened
-                if next_tag.name != 'dora':
-                    who_open_hand.append(int(tag.attrs['who']))
+                # when riichi confirmed (step 2)
+                # let's count it
+                if "<REACH" in tag and 'step="2"' in tag:
+                    who_called_riichi.append(int(self.get_attribute_content(tag, 'who')))
 
-            # when riichi confirmed (step 2)
-            # let's count it
-            if tag.name == 'reach' and int(tag.attrs['step']) == 2:
-                who_called_riichi.append(int(tag.attrs['who']))
+                # because of double ron, we can push round information
+                # after new round started
+                # or after the end of game
+                if round_data and (self.is_init_tag(tag) or 'owari' in tag):
+                    rounds.append(round_data)
+                    round_data = {}
+                    win_scores = {}
+                    lose_scores = {}
+                    who_open_hand = []
+                    who_called_riichi = []
 
-            # because of double ron, we can push round information
-            # after new round started
-            # or after the end of game
-            if round_data and (tag.name == 'init' or 'owari' in tag.attrs):
-                rounds.append(round_data)
-                round_data = {}
-                win_scores = {}
-                lose_scores = {}
-                who_open_hand = []
-                who_called_riichi = []
-
-            # the final results
-            if 'owari' in tag.attrs:
-                scores, _ = self.parse_final_scores(tag)
+                # the final results
+                if 'owari' in tag:
+                    scores, _ = self.parse_final_scores(tag)
 
         if not scores:
             scores = [0] * len(player_names)
@@ -226,8 +222,8 @@ class TenhouLogParser(MahjongConstants):
         }
 
     def parse_game_lobby_and_rule(self, tag):
-        lobby = int(tag.attrs['lobby'])
-        game_rule_temp = int(tag.attrs['type'])
+        lobby = int(self.get_attribute_content(tag, 'lobby'))
+        game_rule_temp = int(self.get_attribute_content(tag, 'type'))
 
         """
           0 - 1 - online, 0 - bots
@@ -278,10 +274,10 @@ class TenhouLogParser(MahjongConstants):
 
     def parse_names(self, tag):
         result = [
-            unquote(tag.attrs['n0']),
-            unquote(tag.attrs['n1']),
-            unquote(tag.attrs['n2']),
-            unquote(tag.attrs['n3'])
+            unquote(self.get_attribute_content(tag, "n0")),
+            unquote(self.get_attribute_content(tag, "n1")),
+            unquote(self.get_attribute_content(tag, "n2")),
+            unquote(self.get_attribute_content(tag, "n3"))
         ]
 
         # we are in hirosima game (for three players)
@@ -291,17 +287,17 @@ class TenhouLogParser(MahjongConstants):
         return result
 
     def parse_rates(self, tag):
-        result = tag.attrs['rate'].split(',')
+        result = self.get_attribute_content(tag, "rate").split(',')
         result = [float(i) for i in result]
         return result
 
     def parse_ranks(self, tag):
-        result = tag.attrs['dan'].split(',')
+        result = self.get_attribute_content(tag, "dan").split(',')
         result = [float(i) for i in result]
         return result
 
     def parse_final_scores(self, tag):
-        data = tag.attrs['owari']
+        data = self.get_attribute_content(tag, 'owari')
         data = [float(i) for i in data.split(',')]
 
         # start at the beginning at take every second item (even)
@@ -310,6 +306,120 @@ class TenhouLogParser(MahjongConstants):
         uma = data[1::2]
 
         return scores, uma
+
+    def split_log_to_game_rounds(self, log_content: str):
+        """
+        XML parser was really slow here,
+        so I built simple parser to separate log content on tags (grouped by rounds)
+        """
+        tag_start = 0
+        rounds = []
+        tag = None
+
+        current_round_tags = []
+        for x in range(0, len(log_content)):
+            if log_content[x] == ">":
+                tag = log_content[tag_start : x + 1]
+                tag_start = x + 1
+
+            # not useful tags
+            skip_tags = ["SHUFFLE", "TAIKYOKU", "mjloggm"]
+            if tag and any([x in tag for x in skip_tags]):
+                tag = None
+
+            # new hand was started
+            if self.is_init_tag(tag) and current_round_tags:
+                rounds.append(current_round_tags)
+                current_round_tags = []
+
+            # the end of the game
+            if tag and "owari" in tag:
+                rounds.append(current_round_tags)
+
+            if tag:
+                if self.is_init_tag(tag):
+                    # we dont need seed information
+                    # it appears in old logs format
+                    find = re.compile(r'shuffle="[^"]*"')
+                    tag = find.sub("", tag)
+
+                # add processed tag to the round
+                current_round_tags.append(tag)
+                tag = None
+
+        return rounds
+
+    def get_attribute_content(self, tag: str, attribute_name: str):
+        result = re.findall(r'{}="([^"]*)"'.format(attribute_name), tag)
+        return result and result[0] or None
+
+    def comma_separated_string_to_ints(self, string: str):
+        return [int(x) for x in string.split(",")]
+
+    def is_init_tag(self, tag):
+        return tag and "INIT" in tag
+
+    def is_agari_tag(self, tag):
+        return tag and "AGARI" in tag
+
+    def parse_meld(self, message):
+        data = int(self.get_attribute_content(message, "m"))
+
+        meld = Meld()
+        meld.who = int(self.get_attribute_content(message, "who"))
+        # 'from_who' is encoded relative the the 'who', so we want
+        # to convert it to be relative to our player
+        meld.from_who = ((data & 0x3) + meld.who) % 4
+
+        if data & 0x4:
+            self.parse_chi(data, meld)
+        elif data & 0x18:
+            self.parse_pon(data, meld)
+        elif data & 0x20:
+            self.parse_nuki(data, meld)
+        else:
+            self.parse_kan(data, meld)
+
+        return meld
+
+    def parse_chi(self, data, meld):
+        meld.type = Meld.CHI
+        t0, t1, t2 = (data >> 3) & 0x3, (data >> 5) & 0x3, (data >> 7) & 0x3
+        base_and_called = data >> 10
+        base = base_and_called // 3
+        called = base_and_called % 3
+        base = (base // 7) * 9 + base % 7
+        meld.tiles = [t0 + 4 * (base + 0), t1 + 4 * (base + 1), t2 + 4 * (base + 2)]
+        meld.called_tile = meld.tiles[called]
+
+    def parse_pon(self, data, meld):
+        t4 = (data >> 5) & 0x3
+        t0, t1, t2 = ((1, 2, 3), (0, 2, 3), (0, 1, 3), (0, 1, 2))[t4]
+        base_and_called = data >> 9
+        base = base_and_called // 3
+        called = base_and_called % 3
+        if data & 0x8:
+            meld.type = Meld.PON
+            meld.tiles = [t0 + 4 * base, t1 + 4 * base, t2 + 4 * base]
+            meld.called_tile = meld.tiles[called]
+        else:
+            meld.type = Meld.SHOUMINKAN
+            meld.tiles = [t0 + 4 * base, t1 + 4 * base, t2 + 4 * base, t4 + 4 * base]
+            meld.called_tile = meld.tiles[3]
+
+    def parse_kan(self, data, meld):
+        base_and_called = data >> 8
+        base = base_and_called // 4
+        meld.type = Meld.KAN
+        meld.tiles = [4 * base, 1 + 4 * base, 2 + 4 * base, 3 + 4 * base]
+        called = base_and_called % 4
+        meld.called_tile = meld.tiles[called]
+        # to mark closed\opened kans
+        meld.opened = meld.who != meld.from_who
+
+    def parse_nuki(self, data, meld):
+        meld.type = Meld.NUKI
+        meld.tiles = [data >> 8]
 
     def _get_log_data(self, log_id):
         if not os.path.exists(logs_temp_directory):

@@ -70,8 +70,9 @@ def _load_log_and_update_game(game):
 
     game.save()
 
+    rounds = []
     for i, round_data in enumerate(player_data['rounds']):
-        GameRound.objects.create(
+        rounds.append(GameRound(
             game=game,
             is_win=round_data['is_win'],
             is_deal=round_data['is_deal'],
@@ -87,6 +88,8 @@ def _load_log_and_update_game(game):
             han=round_data.get('han', 0),
             fu=round_data.get('fu', 0),
             round_counter=i,
-        )
+        ))
+
+    GameRound.objects.bulk_create(rounds)
 
     return JsonResponse({'success': True})

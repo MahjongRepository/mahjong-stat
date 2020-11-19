@@ -45,18 +45,18 @@ class Command(BaseCommand):
             games = []
             for player in players:
                 games.append(
-                    Game.objects.create(
+                    Game(
                         player=player,
                         external_id=log_id,
                         status=Game.STARTED,
-                        game_log_content=content
+                        game_log_content=content.decode('utf-8')
                     )
                 )
 
             for game in games:
                 try:
                     _load_log_and_update_game(game)
-                except Exception:
+                except Exception as e:
                     print(f"Error {log_id}")
 
             if i % 100 == 0:
