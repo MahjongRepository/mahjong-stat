@@ -23,7 +23,7 @@ class Game(models.Model, MahjongConstants):
 
     # let's store all games contents
     # to be able rebuild statistics in future without a lot of downloads from tenhou servers
-    game_log_content = models.TextField()
+    game_log_content = models.TextField(null=True, blank=True)
 
     external_id = models.CharField(max_length=255, default='', null=True, blank=True)
     player_position = models.PositiveSmallIntegerField(default=0)
