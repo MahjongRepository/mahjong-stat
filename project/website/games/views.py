@@ -45,7 +45,7 @@ def _build_stat(games, players, room_filter='all'):
 
     total_games = games.count()
 
-    rounds = GameRound.objects.filter(game__player__in=players)
+    rounds = GameRound.objects.filter(game__player__in=players, game_id__in=[x.id for x in games])
     total_rounds = rounds.count()
     deal_rounds = rounds.filter(is_deal=True).count()
     win_rounds = rounds.filter(is_win=True).count()
@@ -86,6 +86,7 @@ def _build_stat(games, players, room_filter='all'):
     average_win_scores = (rounds
         .filter(is_win=True)
         .aggregate(Avg('win_scores'))['win_scores__avg'])
+    average_game_scores = games.aggregate(Avg('scores'))['scores__avg']
 
     first_position_games = games.filter(player_position=1).count()
     second_position_games = games.filter(player_position=2).count()
@@ -109,6 +110,7 @@ def _build_stat(games, players, room_filter='all'):
         'average_position': average_position,
         'average_deal_scores': average_deal_scores,
         'average_win_scores': average_win_scores,
+        'average_game_scores': average_game_scores,
 
         'feed_rate': feed_rate,
         'win_rate': win_rate,
