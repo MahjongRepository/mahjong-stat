@@ -31,6 +31,7 @@ class Command(BaseCommand):
         i = 0
         results = []
         tar = tarfile.open(options['replays_path'], "r:gz")
+        player_stat = {}
         for member in tqdm(tar.getmembers()):
             f = tar.extractfile(member)
             if f is None:
@@ -55,7 +56,14 @@ class Command(BaseCommand):
 
             for game in games:
                 try:
-                    _load_log_and_update_game(game)
+                    _, player_data = _load_log_and_update_game(game)
+                    if game.player.username not in player_stat:
+                        player_stat[game.player.username] = {
+                            'places': [],
+                            'scores': []
+                        }
+                    player_stat[game.player.username]['places'].append(player_data['position'])
+                    player_stat[game.player.username]['scores'].append(player_data['scores'])
                 except Exception as e:
                     print(f"Error {log_id}")
 
@@ -63,16 +71,31 @@ class Command(BaseCommand):
                 result_item = {
                     'games': i,
                 }
+
                 avgs = []
                 for player in players:
-                    games = Game.objects.filter(player=player).order_by()
-                    average_position = games.aggregate(Avg('player_position'))['player_position__avg']
+                    username = player.username
+
+                    average_position = sum(player_stat[username]['places']) / len(player_stat[player.username]['places'])
                     avgs.append(average_position)
-                    result_item[player.username] = average_position
+
+                    dan_3_pt = sum(
+                        [60 for x in player_stat[username]['places'] if x == 1] +
+                        [15 for x in player_stat[username]['places'] if x == 2] +
+                        [-75 for x in player_stat[username]['places'] if x == 4]
+                    )
+
+                    dan_3_pt = (dan_3_pt / len(player_stat[username]['places'])) * 100
+                    avg_scores = sum(player_stat[username]['scores']) / len(player_stat[username]['scores'])
+
+                    result_item[username] = average_position
+                    result_item[f"{username} pt"] = int(dan_3_pt)
+                    result_item[f"{username} scores"] = int(avg_scores)
 
                 result_item['dispersion'] = max(avgs) - min(avgs)
                 result_item['variation_25'] = max(abs(max(avgs) - 2.5), abs(min(avgs) - 2.5))
                 result_item['stdev'] = statistics.stdev(avgs)
+
                 results.append(result_item)
 
             i += 1

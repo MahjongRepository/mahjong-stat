@@ -7,6 +7,7 @@ __pycache__
 logs
 collected_static
 settings_local.py
+results.csv
 mahjong.db
 
 meta.txt

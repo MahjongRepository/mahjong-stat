@@ -46,7 +46,8 @@ def finish_tenhou_game(request):
     except Game.DoesNotExist:
         return JsonResponse({'success': False, 'reason': 3})
 
-    return _load_log_and_update_game(game)
+    json_response, _ = _load_log_and_update_game(game)
+    return json_response
 
 
 def _load_log_and_update_game(game):
@@ -54,7 +55,7 @@ def _load_log_and_update_game(game):
 
     player_data = next((i for i in results['players'] if i['name'] == game.player.username), None)
     if not player_data:
-        return JsonResponse({'success': False, 'reason': 4})
+        return JsonResponse({'success': False, 'reason': 4}), None
 
     game.status = Game.FINISHED
     game.player_position = player_data['position']
@@ -92,4 +93,4 @@ def _load_log_and_update_game(game):
 
     GameRound.objects.bulk_create(rounds)
 
-    return JsonResponse({'success': True})
+    return JsonResponse({'success': True}), player_data
