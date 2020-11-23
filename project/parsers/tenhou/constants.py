@@ -22,6 +22,19 @@ class MahjongConstants(object):
     HANCHAN_TANYAO_RED_FIVES = 7
     HANCHAN_FAST_TANYAO_RED_FIVES = 8
 
+    IPPAN = 1
+    JOUKYUU = 2
+    TOKUJOU = 3
+    HOUHOU = 4
+
+    GAME_ROOMS = [
+        [UNKNOWN, 'Unknown'],
+        [IPPAN, '一般'],
+        [JOUKYUU, '上級'],
+        [TOKUJOU, '特上'],
+        [HOUHOU, '鳳凰'],
+    ]
+
     GAME_RULES = [
         [UNKNOWN, 'Unknown'],
         [TONPUSEN_NO_TANYAO_NO_RED_FIVES, 'Tonpusen. No tanyao, no red fives'],

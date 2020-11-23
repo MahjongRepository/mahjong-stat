@@ -10,32 +10,39 @@ from website.games.models import GameRound, Game
 def total_statistics(request):
     games = Game.objects.filter(status=Game.FINISHED).order_by('-game_date', '-id')
     players = Player.objects.all()
-    total_games = games.count()
-
-    response_data = {
-        'total_games': total_games,
-        'games': games[:40],
-    }
-    response_data.update(_build_stat(games, players))
+    response_data = _build_stat(games, players, request.GET.get('room', 'all'))
     return render(request, 'website/player_statistics.html', response_data)
 
 
 def player_statistics(request, player_name):
     player = get_object_or_404(Player, username=player_name)
-
     games = player.games.filter(status=Game.FINISHED).order_by('-game_date', '-id')
-    total_games = games.count()
-
     response_data = {
         'player': player,
-        'games': games[:40],
-        'total_games': total_games,
     }
-    response_data.update(_build_stat(games, [player]))
+    response_data.update(_build_stat(games, [player], request.GET.get('room', 'all')))
     return render(request, 'website/player_statistics.html', response_data)
 
 
-def _build_stat(games, players):
+def _build_stat(games, players, room_filter='all'):
+    rooms = games.values_list('game_room', flat=True).order_by('game_room').distinct()
+    room_filters = [
+        {'name': 'All', 'value': 'all'}
+    ]
+    for room in Game.GAME_ROOMS:
+        if room[0] in rooms:
+            room_filters.append({
+                'name': room[1],
+                'value': room[0]
+            })
+
+    latest_rank = games[0].get_rank_display
+    latest_rate = games[0].rate
+
+    if room_filter != 'all':
+        room_filter = int(room_filter)
+        games = games.filter(game_room=room_filter)
+
     total_games = games.count()
 
     rounds = GameRound.objects.filter(game__player__in=players)
@@ -93,6 +100,12 @@ def _build_stat(games, players):
     bankruptcy_rate = (bankruptcy_games / total_games) * 100
 
     return {
+        'games': games[:40],
+        'total_games': total_games,
+
+        'latest_rank': latest_rank,
+        'latest_rate': latest_rate,
+
         'average_position': average_position,
         'average_deal_scores': average_deal_scores,
         'average_win_scores': average_win_scores,
@@ -121,6 +134,9 @@ def _build_stat(games, players):
         'call_and_win': call_and_win,
         'call_and_deal': call_and_deal,
         'call_and_other': call_and_other,
+
+        'room_filters': room_filters,
+        'room_filter': room_filter,
     }
 
 

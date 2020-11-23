@@ -5,7 +5,7 @@
     {% if player %}
         <div class="mt-2">
             <h3 style="display: inline-block" class="align-middle">{{ player.username }}</h3>
-            <span class="badge badge-info text-wrap align-middle">{{ games.0.get_rank_display }} R{{ games.0.rate|floatformat:0 }}</span>
+            <span class="badge badge-info text-wrap align-middle">{{ latest_rank }} R{{ latest_rate|floatformat:0 }}</span>
             <a href="https://nodocchi.moe/tenhoulog/#!&name={{ player.username }}" target="_blank">[Nodochi]</a>
         </div>
     {% else %}
@@ -127,10 +127,15 @@
 
         <div class="col-lg-12">
             <p>Latest {{ games|length }} games (total {{ total_games|intcomma }})</p>
+            <p>
+                Filters:
+                {% for filter in room_filters %}
+                    <a class="badge badge-{% if room_filter == filter.value %}success{% else %}primary{% endif %}" href="?room={{ filter.value }}">{{ filter.name }}</a>
+                {% endfor %}
+            </p>
             <table class="table table-bordered">
                 <tr>
                     <th>Log</th>
-                    <th>Type</th>
                     <th>Position</th>
                     <th>Scores</th>
                     <th>Date</th>
@@ -142,13 +147,12 @@
                                 {{ game.get_tenhou_url }}
                             </a>
                         </td>
-                        <td>{{ game.get_game_rule_display }}</td>
                         <td>{{ game.player_position }}</td>
                         <td>{{ game.scores|intcomma }}</td>
                         <td>{{ game.game_date }}</td>
                     </tr>
                     <tr>
-                        <td colspan="5">
+                        <td colspan="4">
                             <table class="table table-hover table-sm table-borderless">
                                 {% for round in game.rounds.all %}
                                     <tr>

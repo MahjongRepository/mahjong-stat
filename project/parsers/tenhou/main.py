@@ -23,6 +23,7 @@ class TenhouLogParser(MahjongConstants):
         player_ranks = []
         scores = []
         lobby = 0
+        game_room = self.UNKNOWN
         game_rule = self.UNKNOWN
         rounds = []
 
@@ -62,7 +63,7 @@ class TenhouLogParser(MahjongConstants):
 
                 # start of the game
                 if "<GO" in tag:
-                    lobby, game_rule = self.parse_game_lobby_and_rule(tag)
+                    lobby, game_rule, game_room = self.parse_game_lobby_and_rule(tag)
 
                 # someone is win
                 if self.is_agari_tag(tag):
@@ -214,6 +215,7 @@ class TenhouLogParser(MahjongConstants):
 
         return {
             'lobby': lobby,
+            'game_room': game_room,
             'game_type': game_type,
             'game_rule': game_rule,
             'players': players,
@@ -248,6 +250,16 @@ class TenhouLogParser(MahjongConstants):
         is_open_tanyao = rule[6] == '0'
         is_fast = rule[1] == '1'
 
+        game_room = self.UNKNOWN
+        if rule[0] == '0' and rule[2] == '0':
+            game_room = self.IPPAN
+        if rule[0] == '1' and rule[2] == '0':
+            game_room = self.JOUKYUU
+        if rule[0] == '0' and rule[2] == '1':
+            game_room = self.TOKUJOU
+        if rule[0] == '1' and rule[2] == '1':
+            game_room = self.HOUHOU
+
         game_rule = self.UNKNOWN
         if is_hanchan:
             if is_fast:
@@ -270,7 +282,7 @@ class TenhouLogParser(MahjongConstants):
                 if is_open_tanyao and not is_aka:
                     game_rule = self.TONPUSEN_TANYAO_NO_RED_FIVES
 
-        return lobby, game_rule
+        return lobby, game_rule, game_room
 
     def parse_names(self, tag):
         result = [

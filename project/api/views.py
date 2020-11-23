@@ -67,6 +67,7 @@ def _load_log_and_update_game(game):
     game.game_type = results['game_type']
     game.game_date = results['game_date']
     game.lobby = results['lobby']
+    game.game_room = results['game_room']
     game.game_log_content = results['log_data']
 
     game.save()
