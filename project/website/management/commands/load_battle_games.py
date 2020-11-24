@@ -9,7 +9,6 @@ from tqdm import tqdm
 from api.views import _load_log_and_update_game
 from website.accounts.models import Player
 from website.games.models import Game
-from django.db.models import Avg
 
 
 class Command(BaseCommand):
@@ -42,20 +41,19 @@ class Command(BaseCommand):
                 continue
 
             log_id = member.name[2:].split('.')[0]
-
-            games = []
-            for player in players:
-                games.append(
-                    Game(
-                        player=player,
-                        external_id=log_id,
-                        status=Game.STARTED,
-                        game_log_content=content.decode('utf-8')
+            try:
+                games = []
+                for player in players:
+                    games.append(
+                        Game(
+                            player=player,
+                            external_id=log_id,
+                            status=Game.STARTED,
+                            game_log_content=content.decode('utf-8')
+                        )
                     )
-                )
 
-            for game in games:
-                try:
+                for game in games:
                     _, player_data = _load_log_and_update_game(game)
                     if game.player.username not in player_stat:
                         player_stat[game.player.username] = {
@@ -64,8 +62,8 @@ class Command(BaseCommand):
                         }
                     player_stat[game.player.username]['places'].append(player_data['position'])
                     player_stat[game.player.username]['scores'].append(player_data['scores'])
-                except Exception as e:
-                    print(f"Error {log_id}")
+            except Exception as e:
+                print(f"Error {log_id}")
 
             if i % 100 == 0:
                 result_item = {
