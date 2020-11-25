@@ -127,6 +127,8 @@ class TenhouLogParser(MahjongConstants):
                     round_data = {
                         'is_retake': True,
                         'round_number': round_number,
+                        'who_called_riichi': who_called_riichi,
+                        'who_open_hand': who_open_hand,
                         'honba': honba,
                     }
 
@@ -135,9 +137,7 @@ class TenhouLogParser(MahjongConstants):
                     if meld.opened:
                         who_open_hand.append(int(meld.who))
 
-                # when riichi confirmed (step 2)
-                # let's count it
-                if "<REACH" in tag and 'step="2"' in tag:
+                if "<REACH" in tag and 'step="1"' in tag:
                     who_called_riichi.append(int(self.get_attribute_content(tag, 'who')))
 
                 # because of double ron, we can push round information
@@ -168,8 +168,8 @@ class TenhouLogParser(MahjongConstants):
                     'is_deal': False,
                     'is_tsumo': False,
                     'is_retake': False,
-                    'is_open_hand': False,
-                    'is_riichi': False,
+                    'is_open_hand': round_data.get('who_open_hand') and player_seat in round_data['who_open_hand'] or False,
+                    'is_riichi': round_data.get('who_called_riichi') and player_seat in round_data['who_called_riichi'] or False,
                     'is_damaten': False,
                     'round_number': round_data['round_number'],
                     'honba': round_data['honba'],
@@ -188,8 +188,6 @@ class TenhouLogParser(MahjongConstants):
                     data['is_win'] = is_winner
                     data['is_deal'] = is_loser
                     data['is_tsumo'] = is_winner and round_data['from_who'] in round_data['winners']
-                    data['is_open_hand'] = player_seat in round_data['who_open_hand']
-                    data['is_riichi'] = player_seat in round_data['who_called_riichi']
                     data['is_damaten'] = data['is_win'] and not data['is_riichi'] and not data['is_open_hand']
                     data['win_scores'] = player_seat in round_data['win_scores'] and round_data['win_scores'][player_seat] or 0
                     data['lose_scores'] = player_seat in round_data['lose_scores'] and round_data['lose_scores'][player_seat] or 0
