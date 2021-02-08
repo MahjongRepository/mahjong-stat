@@ -1,12 +1,9 @@
 from django.conf import settings
-from django.contrib.humanize.templatetags.humanize import intcomma
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from telegram import ParseMode
-from telegram.ext import Defaults, Updater
-from telegram.utils.helpers import escape_markdown
 
 from api.decorators import token_authentication
+from api.utils import send_telegram_finished_game_message, send_telegram_new_rank_message
 from parsers.tenhou.main import TenhouLogParser
 from website.games.models import Game, GameRound
 
@@ -58,6 +55,8 @@ def _load_log_and_update_game(game):
     if not player_data:
         return JsonResponse({"success": False, "reason": 4}), None
 
+    previous_game = Game.objects.filter(player=game.player).exclude(id=game.id).first()
+
     game.status = Game.FINISHED
     game.player_position = player_data["position"]
     game.scores = player_data["scores"]
@@ -72,6 +71,13 @@ def _load_log_and_update_game(game):
     game.game_log_content = results["log_data"]
 
     game.save()
+
+    if previous_game and game.rank != previous_game.rank:
+        send_telegram_new_rank_message(
+            previous_game.get_rank_display(),
+            game.get_rank_display(),
+            game.rate
+        )
 
     rounds = []
     best_hand_fu = 0
@@ -103,28 +109,11 @@ def _load_log_and_update_game(game):
 
     if settings.TELEGRAM_TOKEN:
         try:
-            send_telegram_message(game, best_hand_fu)
+            send_telegram_finished_game_message(game, best_hand_fu)
         except:
             pass
 
     return JsonResponse({"success": True}), player_data
 
 
-def send_telegram_message(game, best_hand_fu):
-    message = f"Новая игра. \n\n"
-    message += f"Бот занял `{game.player_position}` место (`{intcomma(game.scores)}` очков). \n\n"
-    if best_hand_fu > 0:
-        message += f"Лучшая рука: `{best_hand_fu}` хан. \n\n"
-    message += f"Лог: {game.get_tenhou_url()}"
 
-    defaults = Defaults(parse_mode=ParseMode.MARKDOWN_V2, disable_web_page_preview=True)
-    updater = Updater(token=settings.TELEGRAM_TOKEN, use_context=True, defaults=defaults)
-
-    message = escape_tg_message(message)
-    updater.bot.send_message(chat_id=f"@{settings.TELEGRAM_CHANNEL_NAME}", text=message)
-
-
-def escape_tg_message(message):
-    message = escape_markdown(message, version=2)
-    message = message.replace("\`", "`")
-    return message
