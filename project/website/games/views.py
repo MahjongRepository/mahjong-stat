@@ -87,6 +87,13 @@ def _build_stat(games, players, room_filter='all'):
         .filter(is_win=True)
         .aggregate(Avg('win_scores'))['win_scores__avg'])
     average_game_scores = games.aggregate(Avg('scores'))['scores__avg']
+    places = games.values_list('player_position', flat=True)
+    dan_3_pt = sum(
+        [60 for x in places if x == 1] +
+        [15 for x in places if x == 2] +
+        [-75 for x in places if x == 4]
+    )
+    dan_3_avg_pt = int((dan_3_pt / len(places)) * 100)
 
     first_position_games = games.filter(player_position=1).count()
     second_position_games = games.filter(player_position=2).count()
@@ -111,6 +118,7 @@ def _build_stat(games, players, room_filter='all'):
         'average_deal_scores': average_deal_scores,
         'average_win_scores': average_win_scores,
         'average_game_scores': average_game_scores,
+        'dan_3_avg_pt': dan_3_avg_pt,
 
         'feed_rate': feed_rate,
         'win_rate': win_rate,

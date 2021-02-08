@@ -129,6 +129,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 IS_TEST_RUN = sys.argv[1:2] == ['test']
 
+TELEGRAM_TOKEN = ''
+TELEGRAM_CHANNEL_NAME = ''
+
 try:
     from .settings_local import *
 except:

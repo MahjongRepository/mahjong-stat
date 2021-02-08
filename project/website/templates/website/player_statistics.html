@@ -83,7 +83,7 @@
                 </tr>
                 <tr>
                     <td>Average position</td>
-                    <td>{{ average_position|floatformat:-2 }}</td>
+                    <td>{{ average_position|floatformat:-5 }}</td>
                 </tr>
                 <tr>
                     <td>Average game scores</td>
@@ -96,6 +96,10 @@
                 <tr>
                     <td>Average deal scores</td>
                     <td>{{ average_deal_scores|floatformat:0|intcomma }}</td>
+                </tr>
+                <tr>
+                    <td>3 dan pt per 100 games</td>
+                    <td>{{ dan_3_avg_pt }}</td>
                 </tr>
             </table>
         </div>
