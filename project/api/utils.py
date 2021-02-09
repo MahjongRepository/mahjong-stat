@@ -52,9 +52,10 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
                 round_description += " [даматен].\n"
             else:
                 round_description += ".\n"
-
-        if round_item.is_deal:
+        elif round_item.is_deal:
             round_description += f"`{round_item.round_number_display()}` Накинул в `{round_item.han}` хан и `{round_item.fu}` фу. \n"
+        elif round_item.han > 7:
+            round_description += f"`{round_item.round_number_display()}` Противник собрал жирную руку `{round_item.han}` хан и `{round_item.fu}` фу. \n"
 
     if best_hand_description:
         message += f"Лучшая собранная рука: {best_hand_description}. \n\n"
