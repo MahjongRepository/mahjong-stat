@@ -41,7 +41,7 @@ class Game(models.Model, MahjongConstants):
         ordering = ['-game_date']
 
     def get_tenhou_url(self):
-        return 'http://tenhou.net/0/?log={0}&tw={1}'.format(self.external_id, self.seat)
+        return 'http://tenhou.net/3/?log={0}&tw={1}'.format(self.external_id, self.seat)
 
 
 class GameRound(models.Model):
