@@ -76,15 +76,12 @@ def _load_log_and_update_game(game):
         send_telegram_new_rank_message(
             previous_game.get_rank_display(),
             game.get_rank_display(),
-            game.rate
+            game.rate,
+            Game.objects.filter(status=Game.FINISHED).count(),
         )
 
     rounds = []
-    best_hand_fu = 0
     for i, round_data in enumerate(player_data["rounds"]):
-        if round_data["is_win"] and round_data.get("han", 0) > best_hand_fu:
-            best_hand_fu = round_data.get("han")
-
         rounds.append(
             GameRound(
                 game=game,
@@ -109,11 +106,8 @@ def _load_log_and_update_game(game):
 
     if settings.TELEGRAM_TOKEN:
         try:
-            send_telegram_finished_game_message(game, best_hand_fu)
+            send_telegram_finished_game_message(game, rounds)
         except:
             pass
 
     return JsonResponse({"success": True}), player_data
-
-
-
