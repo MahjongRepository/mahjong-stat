@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.db.models import Avg
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -55,7 +56,9 @@ def _load_log_and_update_game(game):
     if not player_data:
         return JsonResponse({"success": False, "reason": 4}), None
 
-    previous_game = Game.objects.filter(player=game.player).exclude(id=game.id).first()
+    previous_game = (
+        Game.objects.filter(player=game.player).filter(status=Game.FINISHED).exclude(id=game.id).first()
+    )
 
     game.status = Game.FINISHED
     game.player_position = player_data["position"]
@@ -78,6 +81,9 @@ def _load_log_and_update_game(game):
             game.get_rank_display(),
             game.rate,
             Game.objects.filter(status=Game.FINISHED).count(),
+            Game.objects.filter(status=Game.FINISHED)
+            .all()
+            .aggregate(Avg("player_position"))["player_position__avg"],
         )
 
     rounds = []

@@ -21,10 +21,8 @@ def make_random_letters_and_digit_string(length=15):
     return "".join(random.choice(random_chars) for _ in range(length))
 
 
-def send_telegram_new_rank_message(previous_rank, new_rank, new_rate, games_count):
-    message = (
-        f"🎉🎉🎉 Новый ранг `{previous_rank}` -> `{new_rank}` `R{int(new_rate)}`. Игр сыгранно: `{games_count}`"
-    )
+def send_telegram_new_rank_message(previous_rank, new_rank, new_rate, games_count, average_place):
+    message = f"🎉🎉🎉 Новый ранг `{previous_rank}` -> `{new_rank}` `R{int(new_rate)}`. Игр сыграно: `{games_count}`. Ср. место: `{average_place:.2f}`"
     send_telegram_message(message)
 
 
@@ -53,7 +51,9 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
             else:
                 round_description += ".\n"
         elif round_item.is_deal:
-            round_description += f"{get_round_link(round_item)} Накинул в `{round_item.han}` хан и `{round_item.fu}` фу. \n"
+            round_description += (
+                f"{get_round_link(round_item)} Накинул в `{round_item.han}` хан и `{round_item.fu}` фу. \n"
+            )
         elif round_item.han > 7:
             round_description += f"{get_round_link(round_item)} Противник собрал жирную руку в `{round_item.han}` хан и `{round_item.fu}` фу. \n"
 
