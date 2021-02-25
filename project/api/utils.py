@@ -33,7 +33,9 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
     elif game.scores > 50000:
         message += "😎 "
 
-    message += f"Бот занял `{game.player_position}` место и набрал `{intcomma(game.scores)}` очков. \n\n"
+    message += f"`{game.player_position}` место, `{intcomma(game.scores)}` очков. \n\n"
+
+    message += f"Лобби #{game.get_game_room_display()} \n\n"
 
     best_hand_han = 0
     best_hand_description = ""
@@ -47,7 +49,7 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
             win_description = round_item.is_tsumo and "цумо" or "рону"
             round_description += f"{get_round_link(round_item)} Собрал руку `{round_item.han}` хан и `{round_item.fu}` фу по {win_description}"
             if round_item.is_damaten:
-                round_description += " [даматен].\n"
+                round_description += " даматен.\n"
             else:
                 round_description += ".\n"
         elif round_item.is_deal:

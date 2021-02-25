@@ -17,7 +17,7 @@ class Game(models.Model, MahjongConstants):
     game_rule = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_RULES, default=MahjongConstants.UNKNOWN)
     game_type = models.PositiveSmallIntegerField(choices=MahjongConstants.GAME_TYPES, default=MahjongConstants.UNKNOWN)
     lobby = models.PositiveSmallIntegerField(default=0)
-    game_room = models.PositiveSmallIntegerField(default=None, null=True, blank=True)
+    game_room = models.PositiveSmallIntegerField(default=None, null=True, blank=True, choices=MahjongConstants.GAME_ROOMS)
     game_date = models.DateTimeField(default=None, null=True, blank=True)
 
     status = models.PositiveSmallIntegerField(choices=STATUSES)
