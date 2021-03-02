@@ -80,8 +80,8 @@ def _load_log_and_update_game(game):
             previous_game.get_rank_display(),
             game.get_rank_display(),
             game.rate,
-            Game.objects.filter(status=Game.FINISHED).count(),
-            Game.objects.filter(status=Game.FINISHED)
+            Game.objects.filter(status=Game.FINISHED, player=game.player).count(),
+            Game.objects.filter(status=Game.FINISHED, player=game.player)
             .all()
             .aggregate(Avg("player_position"))["player_position__avg"],
         )
