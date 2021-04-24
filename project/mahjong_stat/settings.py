@@ -129,6 +129,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'collected_static')
 
 IS_TEST_RUN = sys.argv[1:2] == ['test']
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 TELEGRAM_TOKEN = ''
 TELEGRAM_CHANNEL_NAME = ''
 
