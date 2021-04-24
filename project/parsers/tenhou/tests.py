@@ -108,24 +108,6 @@ class ParseMetaInformationTestCase(TestCase, TestCaseMixin):
         self.assertEqual(results['players'][2]['rank'], 10)
         self.assertEqual(results['players'][3]['rank'], 1)
 
-    @unittest.skip('for now')
-    def test_parse_hirosima_players(self):
-        data = self._prepare_data("""
-        <mjloggm ver="2.3">
-        <GO type="9" lobby="0"/>
-        <UN n0="%4E%6F%4E%61%6D%65%31" n1="%4E%6F%4E%61%6D%65%32" n2="%4E%6F%4E%61%6D%65%33" n3="" dan="9,2,11,0" rate="1627.06,1479.85,1793.88,1500.00" sx="M,M,M,C"/>
-        <UN n0="%4E%6F%4E%61%6D%65%31"/>
-        </mjloggm>
-        """)
-
-        results = TenhouLogParser().parse_log('2016051813gm-0001-0000-d455c767', data)
-        self.assertEqual(results['game_type'], MahjongConstants.THREE_PLAYERS)
-        self.assertEqual(len(results['players']), 3)
-
-        self.assertEqual(results['players'][0]['name'], 'NoName1')
-        self.assertEqual(results['players'][1]['name'], 'NoName2')
-        self.assertEqual(results['players'][2]['name'], 'NoName3')
-
     def test_parse_lobby(self):
         data = self._prepare_data("""
         <mjloggm ver="2.3">
@@ -507,3 +489,33 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
         self.assertEqual(player['rounds'][1]['honba'], 1)
         self.assertEqual(player['rounds'][2]['round_number'], 1)
         self.assertEqual(player['rounds'][2]['honba'], 0)
+
+    def test_fix_double_ron_wrong_parsing(self):
+        data = self._prepare_data("""
+        <mjloggm ver="2.3">
+        <UN n0="%64%61%6B%65%31%6D%6A" n1="%68%75%73%6B%61%72" n2="%D0%B7%D0%B0%D1%87%D0%B5%D0%BC" n3="%E3%81%A1%E3%82%85%E3%82%93%E3%81%9F" dan="14,14,14,14" rate="1987.69,1871.62,1866.08,1920.37" sx="M,M,M,M"/>
+        
+        <INIT seed="6,0,0,0,2,14" ten="292,285,253,170" oya="2" hai0="80,114,117,16,130,25,42,71,54,97,27,119,32" hai1="33,15,41,38,46,31,78,83,82,96,52,51,7" hai2="4,72,93,131,66,61,109,26,53,57,18,17,73" hai3="35,107,100,24,81,84,34,56,40,90,79,118,43"/>
+        <AGARI ba="0,1" hai="50,54,59,112,114" m="19471,14375,45067" machi="50" ten="30,3900,0" yaku="12,1,52,1,54,1" doraHai="14" who="0" fromWho="3" sc="292,49,285,0,243,0,170,-39" />
+        <AGARI ba="0,0" hai="4,8,12,17,18,19,50,53,57,61,66,69,72,73" machi="50" ten="40,12000,1" yaku="1,1,52,3,53,0" doraHai="14" doraHaiUra="132" who="2" fromWho="3" sc="341,0,285,0,243,120,131,-120" owari="1,2,3,4,5,6,7,8" ten="0,1,2" />
+        
+        </mjloggm>
+        """)
+
+        results = TenhouLogParser().parse_log('2021030410gm-0029-0000-7530e444', data)
+
+        player = next((i for i in results['players'] if i['seat'] == 0), None)
+        self.assertEqual(player['rounds'][0]['han'], 3)
+        self.assertEqual(player['rounds'][0]['fu'], 30)
+        self.assertEqual(player['rounds'][0]['win_scores'], 4900)
+
+        player = next((i for i in results['players'] if i['seat'] == 2), None)
+        self.assertEqual(player['rounds'][0]['han'], 4)
+        self.assertEqual(player['rounds'][0]['fu'], 40)
+        self.assertEqual(player['rounds'][0]['win_scores'], 12000)
+
+        player = next((i for i in results['players'] if i['seat'] == 3), None)
+        self.assertEqual(player['rounds'][0]['is_win'], False)
+        self.assertEqual(player['rounds'][0]['han'], 4)
+        self.assertEqual(player['rounds'][0]['fu'], 40)
+        self.assertEqual(player['rounds'][0]['lose_scores'], 12000)

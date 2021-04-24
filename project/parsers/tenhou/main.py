@@ -6,17 +6,18 @@ from urllib.request import urlopen
 import codecs
 import os
 import struct
+
+import requests
 from django.conf import settings
 from django.utils import timezone
 
 from parsers.tenhou.constants import MahjongConstants
 from parsers.tenhou.meld import Meld
 
-logs_temp_directory = os.path.join(settings.BASE_DIR, 'tests_temp_data')
+logs_temp_directory = os.path.join(settings.BASE_DIR, "tests_temp_data")
 
 
 class TenhouLogParser(MahjongConstants):
-
     def parse_log(self, log_id, log_data=None):
         player_names = []
         player_rates = []
@@ -30,10 +31,10 @@ class TenhouLogParser(MahjongConstants):
         if not log_data:
             log_data = self._get_log_data(log_id)
 
-        game_date = log_id.split('-')[0]
+        game_date = log_id.split("-")[0]
         # 2016052113gm
-        if 'gm' in game_date:
-            game_date = datetime.strptime(game_date, '%Y%m%d%Hgm').replace(tzinfo=timezone.utc)
+        if "gm" in game_date:
+            game_date = datetime.strptime(game_date, "%Y%m%d%Hgm").replace(tzinfo=timezone.utc)
         else:  # local games battle
             game_date = datetime.utcnow().replace(tzinfo=timezone.utc)
 
@@ -50,7 +51,7 @@ class TenhouLogParser(MahjongConstants):
         for round_data_item in parsed_rounds:
             for tag in round_data_item:
                 if self.is_init_tag(tag):
-                    seed = self.get_attribute_content(tag, 'seed').split(',')
+                    seed = self.get_attribute_content(tag, "seed").split(",")
                     seed = [int(i) for i in seed]
 
                     round_number = seed[0]
@@ -67,10 +68,10 @@ class TenhouLogParser(MahjongConstants):
 
                 # someone is win
                 if self.is_agari_tag(tag):
-                    winner = int(self.get_attribute_content(tag, 'who'))
-                    from_who = int(self.get_attribute_content(tag, 'fromWho'))
+                    winner = int(self.get_attribute_content(tag, "who"))
+                    from_who = int(self.get_attribute_content(tag, "fromWho"))
 
-                    ten = self.get_attribute_content(tag, 'ten').split(',')
+                    ten = self.get_attribute_content(tag, "ten").split(",")
                     ten = [int(i) for i in ten]
 
                     win_scores[winner] = ten[1]
@@ -82,8 +83,8 @@ class TenhouLogParser(MahjongConstants):
                             lose_scores[from_who] = ten[1]
 
                     # format: sc="157,20,245,-39,376,-79,222,-39"
-                    if self.get_attribute_content(tag, 'sc'):
-                        scores = self.get_attribute_content(tag, 'sc').split(',')
+                    if self.get_attribute_content(tag, "sc"):
+                        scores = self.get_attribute_content(tag, "sc").split(",")
                         scores = [int(i) for i in scores]
 
                         seat = 0
@@ -98,38 +99,43 @@ class TenhouLogParser(MahjongConstants):
 
                     han = 0
                     fu = ten[0]
-                    if self.get_attribute_content(tag, 'yaku'):
-                        han = sum([int(x) for x in self.get_attribute_content(tag, 'yaku').split(',')[1::2]])
+                    if self.get_attribute_content(tag, "yaku"):
+                        han = sum([int(x) for x in self.get_attribute_content(tag, "yaku").split(",")[1::2]])
 
-                    if self.get_attribute_content(tag, 'yakuman'):
+                    if self.get_attribute_content(tag, "yakuman"):
                         # TODO save real yakuman value
                         han = 13
 
                     if round_data:
-                        round_data['winners'].append(winner)
+                        round_data["winners"].append(winner)
+                        round_data["han"][winner] = han
+                        round_data["fu"][winner] = fu
+                        if round_data["han"].get(from_who, 0) < han:
+                            round_data["han"][from_who] = han
+                            round_data["fu"][from_who] = fu
                     else:
                         round_data = {
-                            'winners': [winner],
-                            'from_who': from_who,
-                            'who_open_hand': who_open_hand,
-                            'who_called_riichi': who_called_riichi,
-                            'is_retake': False,
-                            'round_number': round_number,
-                            'honba': honba,
-                            'win_scores': win_scores,
-                            'lose_scores': lose_scores,
-                            'han': han,
-                            'fu': fu,
+                            "winners": [winner],
+                            "from_who": from_who,
+                            "who_open_hand": who_open_hand,
+                            "who_called_riichi": who_called_riichi,
+                            "is_retake": False,
+                            "round_number": round_number,
+                            "honba": honba,
+                            "win_scores": win_scores,
+                            "lose_scores": lose_scores,
+                            "han": {winner: han, from_who: han},
+                            "fu": {winner: fu, from_who: fu},
                         }
 
                 # retake
                 if "<RYUUKYOKU" in tag:
                     round_data = {
-                        'is_retake': True,
-                        'round_number': round_number,
-                        'who_called_riichi': who_called_riichi,
-                        'who_open_hand': who_open_hand,
-                        'honba': honba,
+                        "is_retake": True,
+                        "round_number": round_number,
+                        "who_called_riichi": who_called_riichi,
+                        "who_open_hand": who_open_hand,
+                        "honba": honba,
                     }
 
                 if "<N who=" in tag:
@@ -138,12 +144,12 @@ class TenhouLogParser(MahjongConstants):
                         who_open_hand.append(int(meld.who))
 
                 if "<REACH" in tag and 'step="1"' in tag:
-                    who_called_riichi.append(int(self.get_attribute_content(tag, 'who')))
+                    who_called_riichi.append(int(self.get_attribute_content(tag, "who")))
 
                 # because of double ron, we can push round information
                 # after new round started
                 # or after the end of game
-                if round_data and (self.is_init_tag(tag) or 'owari' in tag):
+                if round_data and (self.is_init_tag(tag) or "owari" in tag):
                     rounds.append(round_data)
                     round_data = {}
                     win_scores = {}
@@ -152,7 +158,7 @@ class TenhouLogParser(MahjongConstants):
                     who_called_riichi = []
 
                 # the final results
-                if 'owari' in tag:
+                if "owari" in tag:
                     scores, _ = self.parse_final_scores(tag)
 
         if not scores:
@@ -164,66 +170,81 @@ class TenhouLogParser(MahjongConstants):
 
             for round_data in rounds:
                 data = {
-                    'is_win': False,
-                    'is_deal': False,
-                    'is_tsumo': False,
-                    'is_retake': False,
-                    'is_open_hand': round_data.get('who_open_hand') and player_seat in round_data['who_open_hand'] or False,
-                    'is_riichi': round_data.get('who_called_riichi') and player_seat in round_data['who_called_riichi'] or False,
-                    'is_damaten': False,
-                    'round_number': round_data['round_number'],
-                    'honba': round_data['honba'],
-                    'han': round_data.get('han', 0),
-                    'fu': round_data.get('fu', 0),
-                    'win_scores': 0,
-                    'lose_scores': 0,
+                    "is_win": False,
+                    "is_deal": False,
+                    "is_tsumo": False,
+                    "is_retake": False,
+                    "is_open_hand": round_data.get("who_open_hand")
+                    and player_seat in round_data["who_open_hand"]
+                    or False,
+                    "is_riichi": round_data.get("who_called_riichi")
+                    and player_seat in round_data["who_called_riichi"]
+                    or False,
+                    "is_damaten": False,
+                    "round_number": round_data["round_number"],
+                    "honba": round_data["honba"],
+                    "han": round_data.get('han', {}).get(player_seat, 0),
+                    "fu": round_data.get('fu', {}).get(player_seat, 0),
+                    "win_scores": 0,
+                    "lose_scores": 0,
                 }
 
-                if round_data['is_retake']:
-                    data['is_retake'] = True
+                if round_data["is_retake"]:
+                    data["is_retake"] = True
                 else:
-                    is_winner = player_seat in round_data['winners']
-                    is_loser = round_data['from_who'] not in round_data['winners'] and round_data['from_who'] == player_seat
+                    is_winner = player_seat in round_data["winners"]
+                    is_loser = (
+                        round_data["from_who"] not in round_data["winners"]
+                        and round_data["from_who"] == player_seat
+                    )
 
-                    data['is_win'] = is_winner
-                    data['is_deal'] = is_loser
-                    data['is_tsumo'] = is_winner and round_data['from_who'] in round_data['winners']
-                    data['is_damaten'] = data['is_win'] and not data['is_riichi'] and not data['is_open_hand']
-                    data['win_scores'] = player_seat in round_data['win_scores'] and round_data['win_scores'][player_seat] or 0
-                    data['lose_scores'] = player_seat in round_data['lose_scores'] and round_data['lose_scores'][player_seat] or 0
+                    data["is_win"] = is_winner
+                    data["is_deal"] = is_loser
+                    data["is_tsumo"] = is_winner and round_data["from_who"] in round_data["winners"]
+                    data["is_damaten"] = data["is_win"] and not data["is_riichi"] and not data["is_open_hand"]
+                    data["win_scores"] = (
+                        player_seat in round_data["win_scores"] and round_data["win_scores"][player_seat] or 0
+                    )
+                    data["lose_scores"] = (
+                        player_seat in round_data["lose_scores"]
+                        and round_data["lose_scores"][player_seat]
+                        or 0
+                    )
 
                 player_rounds.append(data)
 
-            players.append({
-                'name': player_names[player_seat],
-                'rate': player_rates[player_seat],
-                'rank': player_ranks[player_seat],
-                'scores': int(scores[player_seat] * 100),
-                'seat': player_seat,
-                'rounds': player_rounds
-            })
+            players.append(
+                {
+                    "name": player_names[player_seat],
+                    "rate": player_rates[player_seat],
+                    "rank": player_ranks[player_seat],
+                    "scores": int(scores[player_seat] * 100),
+                    "seat": player_seat,
+                    "rounds": player_rounds,
+                }
+            )
 
-        players = sorted(players, key=lambda x: x['scores'], reverse=True)
+        players = sorted(players, key=lambda x: x["scores"], reverse=True)
         for player_seat in range(0, len(players)):
-            players[player_seat]['position'] = player_seat + 1
+            players[player_seat]["position"] = player_seat + 1
 
         game_type = self.FOUR_PLAYERS
         if len(players) == 3:
             game_type = self.THREE_PLAYERS
 
         return {
-            'lobby': lobby,
-            'game_room': game_room,
-            'game_type': game_type,
-            'game_rule': game_rule,
-            'players': players,
-            'log_data': log_data,
-            'game_date': game_date
+            "lobby": lobby,
+            "game_room": game_room,
+            "game_type": game_type,
+            "game_rule": game_rule,
+            "players": players,
+            "log_data": log_data,
+            "game_date": game_date,
         }
 
     def parse_game_lobby_and_rule(self, tag):
-        lobby = int(self.get_attribute_content(tag, 'lobby'))
-        game_rule_temp = int(self.get_attribute_content(tag, 'type'))
+        lobby = int(self.get_attribute_content(tag, "lobby"))
+        game_rule_temp = int(self.get_attribute_content(tag, "type"))
 
         """
           0 - 1 - online, 0 - bots
@@ -239,23 +260,23 @@ class TenhouLogParser(MahjongConstants):
           00001001 = 9 = hanchan ari-ari
           00000001 = 1 = tonpu-sen ari-ari
         """
-        rule = bin(game_rule_temp).replace('0b', '')
+        rule = bin(game_rule_temp).replace("0b", "")
         while len(rule) != 8:
-            rule = '0' + rule
+            rule = "0" + rule
 
-        is_hanchan = rule[4] == '1'
-        is_aka = rule[7] == '1'
-        is_open_tanyao = rule[6] == '0'
-        is_fast = rule[1] == '1'
+        is_hanchan = rule[4] == "1"
+        is_aka = rule[7] == "1"
+        is_open_tanyao = rule[6] == "0"
+        is_fast = rule[1] == "1"
 
         game_room = self.UNKNOWN
-        if rule[0] == '0' and rule[2] == '0':
+        if rule[0] == "0" and rule[2] == "0":
             game_room = self.IPPAN
-        if rule[0] == '1' and rule[2] == '0':
+        if rule[0] == "1" and rule[2] == "0":
             game_room = self.JOUKYUU
-        if rule[0] == '0' and rule[2] == '1':
+        if rule[0] == "0" and rule[2] == "1":
             game_room = self.TOKUJOU
-        if rule[0] == '1' and rule[2] == '1':
+        if rule[0] == "1" and rule[2] == "1":
             game_room = self.HOUHOU
 
         game_rule = self.UNKNOWN
@@ -287,7 +308,7 @@ class TenhouLogParser(MahjongConstants):
             unquote(self.get_attribute_content(tag, "n0")),
             unquote(self.get_attribute_content(tag, "n1")),
             unquote(self.get_attribute_content(tag, "n2")),
-            unquote(self.get_attribute_content(tag, "n3"))
+            unquote(self.get_attribute_content(tag, "n3")),
         ]
 
         # we are in hirosima game (for three players)
@@ -297,18 +318,18 @@ class TenhouLogParser(MahjongConstants):
         return result
 
     def parse_rates(self, tag):
-        result = self.get_attribute_content(tag, "rate").split(',')
+        result = self.get_attribute_content(tag, "rate").split(",")
         result = [float(i) for i in result]
         return result
 
     def parse_ranks(self, tag):
-        result = self.get_attribute_content(tag, "dan").split(',')
+        result = self.get_attribute_content(tag, "dan").split(",")
         result = [float(i) for i in result]
         return result
 
     def parse_final_scores(self, tag):
-        data = self.get_attribute_content(tag, 'owari')
-        data = [float(i) for i in data.split(',')]
+        data = self.get_attribute_content(tag, "owari")
+        data = [float(i) for i in data.split(",")]
 
         # start at the beginning at take every second item (even)
         scores = data[::2]
@@ -435,10 +456,10 @@ class TenhouLogParser(MahjongConstants):
         if not os.path.exists(logs_temp_directory):
             os.mkdir(logs_temp_directory)
 
-        log_file = os.path.join(logs_temp_directory, log_id + '.xml')
+        log_file = os.path.join(logs_temp_directory, log_id + ".xml")
 
         if os.path.exists(log_file):
-            log_file = open(log_file, 'r')
+            log_file = open(log_file, "rb")
             log_data = log_file.read()
             log_file.close()
         else:
@@ -446,32 +467,56 @@ class TenhouLogParser(MahjongConstants):
             log_data = self._download_log(log_id)
 
             if settings.IS_TEST_RUN:
-                with open(log_file, 'wb') as f:
+                with open(log_file, "wb") as f:
                     f.write(log_data)
 
-        return log_data
+        return log_data.decode('utf-8')
 
     def _download_log(self, log_id):
-        resp = urlopen('http://tenhou.net/0/log/?' + log_id)
-        data = resp.read()
-        return data
+        response = requests.get(f"http://tenhou.net/0/log/?{log_id}")
+        return response.content
 
     def _get_log_name_for_download(self, log_id):
         table = [
-            22136, 52719, 55146, 42104,
-            59591, 46934, 9248,  28891,
-            49597, 52974, 62844, 4015,
-            18311, 50730, 43056, 17939,
-            64838, 38145, 27008, 39128,
-            35652, 63407, 65535, 23473,
-            35164, 55230, 27536, 4386,
-            64920, 29075, 42617, 17294,
-            18868, 2081
+            22136,
+            52719,
+            55146,
+            42104,
+            59591,
+            46934,
+            9248,
+            28891,
+            49597,
+            52974,
+            62844,
+            4015,
+            18311,
+            50730,
+            43056,
+            17939,
+            64838,
+            38145,
+            27008,
+            39128,
+            35652,
+            63407,
+            65535,
+            23473,
+            35164,
+            55230,
+            27536,
+            4386,
+            64920,
+            29075,
+            42617,
+            17294,
+            18868,
+            2081,
         ]
 
         code_pos = log_id.rindex("-") + 1
         code = log_id[code_pos:]
-        if code[0] == 'x':
+        if code[0] == "x":
             a, b, c = struct.unpack(">HHH", bytes.fromhex(code[1:]))
             index = 0
             if log_id[:12] > "2010041111gm":
@@ -480,6 +525,8 @@ class TenhouLogParser(MahjongConstants):
                 index = x % (33 - y)
             first = (a ^ b ^ table[index]) & 0xFFFF
             second = (b ^ c ^ table[index] ^ table[index + 1]) & 0xFFFF
-            return log_id[:code_pos] + codecs.getencoder('hex_codec')(struct.pack(">HH", first, second))[0].decode('ASCII')
+            return log_id[:code_pos] + codecs.getencoder("hex_codec")(struct.pack(">HH", first, second))[
+                0
+            ].decode("ASCII")
         else:
             return log_id
