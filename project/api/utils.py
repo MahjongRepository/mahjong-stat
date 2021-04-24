@@ -34,7 +34,7 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
     elif game.scores > 50000:
         message += "😎 "
 
-    message += f"`{game.player_position}` место, `{intcomma(game.scores)}` очков. #{game.player_position} \n\n"
+    message += f"`{game.player_position}` место, `{intcomma(game.scores)}` очков. #{game.player_position}место \n\n"
 
     message += f"Лобби #{game.get_game_room_display()} \n\n"
 
