@@ -21,7 +21,7 @@ class GameAdmin(admin.ModelAdmin):
         return ''
 
     def player_link(self, obj):
-        url = reverse('player_statistics', kwargs={'player_name': obj.player.username})
+        url = reverse('player_statistics', kwargs={'player_id': obj.player.id})
         return format_html(f'<a href="{url}" target="_blank">{obj.player.username}</a>')
 
 
