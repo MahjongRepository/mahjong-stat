@@ -4,9 +4,15 @@
 {% block content %}
     {% if player %}
         <div class="mt-2">
-            <h3 style="display: inline-block" class="align-middle">{{ player.username }}</h3>
-            <span class="badge badge-info text-wrap align-middle">{{ latest_rank }} R{{ latest_rate|floatformat:0 }}</span>
-            <a href="https://nodocchi.moe/tenhoulog/#!&name={{ player.username }}" target="_blank">[Nodochi]</a>
+            {% if request.user.is_authenticated %}
+                <h3 style="display: inline-block" class="align-middle">{{ player.username }}</h3>
+                <span class="badge badge-info text-wrap align-middle">{{ latest_rank }} R{{ latest_rate|floatformat:0 }}</span>
+                <a href="https://nodocchi.moe/tenhoulog/#!&name={{ player.username }}" target="_blank">[Nodochi]</a>
+            {% else %}
+                <h3 style="display: inline-block" class="align-middle">Bot id={{ player.id }}</h3>
+                <span class="badge badge-info text-wrap align-middle">{{ latest_rank }} R{{ latest_rate|floatformat:0 }}</span>
+                <a href="{% url 'home' %}">[Home]</a>
+            {% endif %}
         </div>
     {% else %}
         <div class="mt-2">
@@ -203,7 +209,7 @@
                                         </td>
                                         <td>
                                             <code>
-                                                python reproducer.py --log {{ game.external_id }} --player {{ game.player.username }} --wind {{ round.round_number|add:1 }} --honba {{ round.honba }} --action draw --n 1 --tile
+                                                python reproducer.py --log {{ game.external_id }} --player {{ game.seat }} --wind {{ round.round_number|add:1 }} --honba {{ round.honba }} --action draw --n 1 --tile
                                             </code>
                                         </td>
                                     </tr>

@@ -14,8 +14,8 @@ def total_statistics(request):
     return render(request, 'website/player_statistics.html', response_data)
 
 
-def player_statistics(request, player_name):
-    player = get_object_or_404(Player, username=player_name)
+def player_statistics(request, player_id):
+    player = get_object_or_404(Player, id=player_id)
     games = player.games.filter(status=Game.FINISHED).order_by('-game_date', '-id')
     response_data = {
         'player': player,
