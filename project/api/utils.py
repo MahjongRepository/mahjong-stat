@@ -49,15 +49,18 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
             win_description = round_item.is_tsumo and "цумо" or "рону"
             round_description += f"{get_round_link(round_item)} Собрал руку `{round_item.han}` хан и `{round_item.fu}` фу по {win_description}"
             if round_item.is_damaten:
-                round_description += " даматен.\n"
-            else:
-                round_description += ".\n"
+                round_description += " даматен."
         elif round_item.is_deal:
             round_description += (
-                f"{get_round_link(round_item)} Накинул в `{round_item.han}` хан и `{round_item.fu}` фу. \n"
+                f"{get_round_link(round_item)} Накинул в `{round_item.han}` хан и `{round_item.fu}` фу."
             )
         elif round_item.han > 7:
-            round_description += f"{get_round_link(round_item)} Противник собрал жирную руку в `{round_item.han}` хан и `{round_item.fu}` фу. \n"
+            round_description += f"{get_round_link(round_item)} Противник собрал жирную руку в `{round_item.han}` хан и `{round_item.fu}` фу."
+
+        if round_item.han >= 13:
+            round_description += " ЯКУМАН.\n"
+        else:
+            round_description += "\n"
 
     if best_hand_description:
         message += f"Лучшая собранная рука: {best_hand_description}. \n\n"
