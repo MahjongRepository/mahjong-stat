@@ -422,7 +422,7 @@ class ParseRoundTestCase(TestCase, TestCaseMixin):
 
         player = next((i for i in results['players'] if i['seat'] == 0), None)
         self.assertEqual(player['rounds'][0]['is_riichi'], True)
-        self.assertEqual(player['rounds'][1]['is_riichi'], False)
+        self.assertEqual(player['rounds'][1]['is_riichi'], True)
 
         player = next((i for i in results['players'] if i['seat'] == 1), None)
         self.assertEqual(player['rounds'][0]['is_riichi'], False)
