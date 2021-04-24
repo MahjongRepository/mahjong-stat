@@ -153,5 +153,5 @@ def _build_stat(games, players, room_filter='all'):
 @staff_member_required
 def manually_load_results(request, game_id):
     game = Game.objects.get(id=game_id)
-    _load_log_and_update_game(game)
+    _load_log_and_update_game(game, sent_new_rank_message=False)
     return redirect(request.META['HTTP_REFERER'])

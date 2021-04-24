@@ -49,7 +49,7 @@ def finish_tenhou_game(request):
     return json_response
 
 
-def _load_log_and_update_game(game):
+def _load_log_and_update_game(game, sent_new_rank_message=True):
     results = TenhouLogParser().parse_log(game.external_id, game.game_log_content)
 
     player_data = next((i for i in results["players"] if i["name"] == game.player.username), None)
@@ -75,7 +75,7 @@ def _load_log_and_update_game(game):
 
     game.save()
 
-    if previous_game and game.rank != previous_game.rank:
+    if previous_game and game.rank != previous_game.rank and sent_new_rank_message:
         send_telegram_new_rank_message(
             previous_game.get_rank_display(),
             game.get_rank_display(),
