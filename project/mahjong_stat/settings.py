@@ -133,6 +133,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 TELEGRAM_TOKEN = ''
 TELEGRAM_CHANNEL_NAME = ''
+STAT_HOST = ''
 
 try:
     from .settings_local import *

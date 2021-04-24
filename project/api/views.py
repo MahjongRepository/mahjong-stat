@@ -113,7 +113,7 @@ def _load_log_and_update_game(game, sent_new_rank_message=True):
     if settings.TELEGRAM_TOKEN:
         try:
             send_telegram_finished_game_message(game, rounds)
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     return JsonResponse({"success": True}), player_data

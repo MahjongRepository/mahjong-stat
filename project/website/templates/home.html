@@ -5,7 +5,7 @@
         <ul>
             <li><a href="{% url 'total_statistics' %}">Combined</a></li>
             {% for player in players %}
-                <li><a href="{% url 'player_statistics' player.id %}">Bot id={{ player.id }}</a></li>
+                <li><a href="{% url 'player_statistics' player.id %}">Player id={{ player.id }}</a></li>
             {% endfor %}
         </ul>
     </div>

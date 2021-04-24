@@ -4,6 +4,7 @@ from typing import List
 
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import intcomma
+from django.urls import reverse
 from telegram import ParseMode
 from telegram.ext import Defaults, Updater
 from telegram.utils.helpers import escape_markdown
@@ -47,9 +48,9 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
 
         if round_item.is_win:
             win_description = round_item.is_tsumo and "цумо" or "рону"
-            round_description += f"{get_round_link(round_item)} Собрал руку `{round_item.han}` хан и `{round_item.fu}` фу по {win_description}"
+            round_description += f"{get_round_link(round_item)} Собрал руку `{round_item.han}` хан и `{round_item.fu}` фу по {win_description}."
             if round_item.is_damaten:
-                round_description += " даматен."
+                round_description += " #даматен"
         elif round_item.is_deal:
             round_description += (
                 f"{get_round_link(round_item)} Накинул в `{round_item.han}` хан и `{round_item.fu}` фу."
@@ -58,8 +59,9 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
             round_description += f"{get_round_link(round_item)} Противник собрал жирную руку в `{round_item.han}` хан и `{round_item.fu}` фу."
 
         if round_item.han >= 13:
-            round_description += " ЯКУМАН.\n"
-        else:
+            round_description += " #якуман\n"
+
+        if round_item.is_win or round_item.is_deal or round_item.han > 7:
             round_description += "\n"
 
     if best_hand_description:
@@ -72,7 +74,8 @@ def send_telegram_finished_game_message(game, rounds: List[GameRound]):
     else:
         message += "Никуда не накинул и ничего не собрал. Чиллил всю игру. \n\n"
 
-    message += f"Лог: {game.get_tenhou_url()}"
+    message += f"Лог на тенхе: {game.get_tenhou_url()} \n"
+    message += f"Репродюсер: {settings.STAT_HOST}{reverse('game_details', kwargs={'game_id': game.id})}"
 
     send_telegram_message(message)
 

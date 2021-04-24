@@ -8,8 +8,9 @@
                 <h3 style="display: inline-block" class="align-middle">{{ player.username }}</h3>
                 <span class="badge badge-info text-wrap align-middle">{{ latest_rank }} R{{ latest_rate|floatformat:0 }}</span>
                 <a href="https://nodocchi.moe/tenhoulog/#!&name={{ player.username }}" target="_blank">[Nodochi]</a>
+                <a href="{% url 'home' %}">[Home]</a>
             {% else %}
-                <h3 style="display: inline-block" class="align-middle">Bot id={{ player.id }}</h3>
+                <h3 style="display: inline-block" class="align-middle">Player id={{ player.id }}</h3>
                 <span class="badge badge-info text-wrap align-middle">{{ latest_rank }} R{{ latest_rate|floatformat:0 }}</span>
                 <a href="{% url 'home' %}">[Home]</a>
             {% endif %}
@@ -17,6 +18,7 @@
     {% else %}
         <div class="mt-2">
             <h3 style="display: inline-block" class="align-middle">Total</h3>
+            <a href="{% url 'home' %}">[Home]</a>
         </div>
     {% endif %}
     <div class="row mt-2">
@@ -155,68 +157,7 @@
                     <th>Date</th>
                 </tr>
                 {% for game in games %}
-                    <tr>
-                        <td>
-                            <a href="{{ game.get_tenhou_url }}" target="_blank">
-                                {{ game.get_tenhou_url }}
-                            </a>
-                        </td>
-                        <td>{{ game.player_position }}</td>
-                        <td>{{ game.scores|intcomma }}</td>
-                        <td>{{ game.game_date }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">
-                            <table class="table table-hover table-sm table-borderless">
-                                {% for round in game.rounds.all %}
-                                    <tr>
-                                        <td style="width: 50px">
-                                            <a href="{{ round.get_tenhou_url_for_round }}" target="_blank">
-                                                {{ round.round_number_display }}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            {% if round.is_riichi %}
-                                                Riichi,
-                                                {% if not round.is_win %}
-                                                    Failed
-                                                {% endif %}
-                                            {% endif %}
-
-                                            {% if round.is_win %}
-                                                <b>Win ({{ round.is_tsumo|yesno:"tsumo,ron" }}) {{ round.win_scores|intcomma }}</b><b></b>
-                                            {% endif %}
-
-                                            {% if round.is_deal %}
-                                                Deal to hand {{ round.lose_scores|intcomma }}
-                                            {% endif %}
-
-                                            {% if not round.is_deal and round.lose_scores %}
-                                                Pay for tsumo {{ round.lose_scores|intcomma }}
-                                            {% endif %}
-
-                                            {% if round.is_retake %}
-                                                Redraw
-                                            {% endif %}
-
-                                            {% if not round.is_win and not round.is_deal and not round.is_retake and not round.is_riichi and not round.lose_scores %}
-                                                -
-                                            {% endif %}
-
-                                            {% if round.is_damaten %}
-                                                <span class="badge badge-success">damaten</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <code>
-                                                python reproducer.py --log {{ game.external_id }} --player {{ game.seat }} --wind {{ round.round_number|add:1 }} --honba {{ round.honba }} --action draw --n 1 --tile
-                                            </code>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                    </tr>
+                    {% include 'website/_game_item.html' %}
                 {% endfor %}
             </table>
         </div>

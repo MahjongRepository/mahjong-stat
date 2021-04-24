@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <div class="mt-2">
+        <a href="{% url 'player_statistics' game.player.id %}">[Player]</a>
+        <a href="{% url 'home' %}">[Home]</a>
+    </div>
+    <table class="table table-bordered mt-2">
+        <tr>
+            <th>Log</th>
+            <th>Position</th>
+            <th>Scores</th>
+            <th>Date</th>
+        </tr>
+        {% include 'website/_game_item.html' %}
+    </table>
+{% endblock %}
