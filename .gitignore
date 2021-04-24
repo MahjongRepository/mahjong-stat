@@ -14,3 +14,5 @@ meta.txt
 
 tests_temp_data
 phoenix_data
+
+project/website/management/commands/add_game.py
