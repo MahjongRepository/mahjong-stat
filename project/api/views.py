@@ -75,7 +75,7 @@ def _load_log_and_update_game(game, sent_new_rank_message=True):
 
     game.save()
 
-    if previous_game and game.rank != previous_game.rank and sent_new_rank_message:
+    if settings.TELEGRAM_TOKEN and previous_game and game.rank != previous_game.rank and sent_new_rank_message:
         send_telegram_new_rank_message(
             previous_game.get_rank_display(),
             game.get_rank_display(),
