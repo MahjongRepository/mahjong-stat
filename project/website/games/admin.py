@@ -32,7 +32,7 @@ class GameRoundAdmin(admin.ModelAdmin):
 
     def player_link(self, obj):
         username = obj.game.player.username
-        url = reverse('player_statistics', kwargs={'player_name': username})
+        url = reverse('player_statistics', kwargs={'player_id': obj.game.player.id})
         return format_html(f'<a href="{url}" target="_blank">{username}</a>')
 
     def game_link(self, obj):
